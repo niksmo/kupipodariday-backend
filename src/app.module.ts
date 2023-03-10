@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
+import { ConfigModule } from '@nestjs/config';
+import { OrmModule } from './db/orm.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
+  imports: [ConfigModule.forRoot({ envFilePath: '.env' }), OrmModule],
   providers: [],
 })
 export class AppModule {}
