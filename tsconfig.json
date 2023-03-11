@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig-checks.json",
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
