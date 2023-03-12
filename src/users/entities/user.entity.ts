@@ -1,13 +1,13 @@
-import { CommonColumns } from 'src/data-base/common.entity';
-import { Offer } from 'src/offers/entities/offer.entity';
+import { CommonColumns } from 'data-base/common.entity';
+import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
-import { Wish } from 'src/wishes/entities/wish.entity';
-import { WishList } from 'src/wishlists/entities/wishlist.entity';
+import { Wish } from 'wishes/entities/wish.entity';
+import { WishList } from 'wishlists/entities/wishlist.entity';
 
 @Entity()
 export class User extends CommonColumns {
   @Column({ type: 'varchar', length: 30, unique: true })
-  userName: string;
+  username: string;
 
   @Column({
     type: 'varchar',

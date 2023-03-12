@@ -1,7 +1,7 @@
-import { CommonColumns } from 'src/data-base/common.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { Wish } from 'src/wishes/entities/wish.entity';
+import { CommonColumns } from 'data-base/common.entity';
+import { Column, Entity, ManyToOne } from 'typeorm';
+import { User } from 'users/entities/user.entity';
+import { Wish } from 'wishes/entities/wish.entity';
 
 @Entity()
 export class Offer extends CommonColumns {

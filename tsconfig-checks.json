@@ -14,6 +14,8 @@
     "noStrictGenericChecks": false,
     "suppressExcessPropertyErrors": false,
     "suppressImplicitAnyIndexErrors": false,
-    "noImplicitUseStrict": false
+    "noImplicitUseStrict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   }
 }

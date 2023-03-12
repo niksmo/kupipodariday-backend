@@ -1,8 +1,8 @@
-import { CommonColumns } from 'src/data-base/common.entity';
-import { Offer } from 'src/offers/entities/offer.entity';
+import { CommonColumns } from 'data-base/common.entity';
+import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { WishList } from 'src/wishlists/entities/wishlist.entity';
+import { User } from 'users/entities/user.entity';
+import { WishList } from 'wishlists/entities/wishlist.entity';
 
 @Entity()
 export class Wish extends CommonColumns {
