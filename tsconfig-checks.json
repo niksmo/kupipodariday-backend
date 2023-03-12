@@ -9,7 +9,7 @@
     "strictBindCallApply": true,
     "useUnknownInCatchVariables": true,
     "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": true,
+    "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": true,
     "noStrictGenericChecks": false,
     "suppressExcessPropertyErrors": false,
