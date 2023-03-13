@@ -12,6 +12,14 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>
   ) {}
 
+  async findByName(username: string) {
+    return await this.usersRepository.findOneBy({ username });
+  }
+
+  async findByEmail(email: string) {
+    return await this.usersRepository.findOneBy({ email });
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
       await hashPassword(createUserDto);
@@ -19,9 +27,9 @@ export class UsersService {
       return user;
     } catch (error) {
       if (isDuplicateError(error)) {
-        throw new KeyDuplicateExeption({
-          message: 'Пользователь с таким email или именем уже зарегистрирован',
-        });
+        throw new KeyDuplicateExeption(
+          'Пользователь с таким email или именем уже зарегистрирован'
+        );
       }
       throw error;
     }

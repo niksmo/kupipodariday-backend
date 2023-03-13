@@ -1,22 +1,27 @@
-import { IsEmail, IsOptional, IsString, IsUrl, Length } from 'class-validator';
+import { IsOptional, IsUrl, Length, Matches } from 'class-validator';
+import { EMAIL_PATTERN, NAME_PATTERN, PASSWORD_PATTERN } from 'users/lib';
 
 export class CreateUserDto {
-  @IsString()
-  @Length(2, 30)
+  @Matches(NAME_PATTERN, {
+    message: 'Имя пользователя должно быть на латинском от 2 до 30 символов',
+  })
   readonly username: string;
 
-  @IsString()
-  @Length(2, 200)
+  @Length(2, 200, {
+    message: 'Раздел "О себе" должен содержать от 2 до 200 символов',
+  })
   @IsOptional()
   readonly about: string;
 
-  @IsUrl()
+  @IsUrl(undefined, { message: 'Неверная ссылка на аватар' })
   @IsOptional()
   readonly avatar: string;
 
-  @IsEmail()
+  @Matches(EMAIL_PATTERN, { message: 'Email указан неверно' })
   readonly email: string;
 
-  @IsString()
+  @Matches(PASSWORD_PATTERN, {
+    message: 'Пароль должен содержать латинские и специальные символы',
+  })
   password: string;
 }
