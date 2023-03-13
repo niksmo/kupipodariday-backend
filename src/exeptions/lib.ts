@@ -1,6 +1,5 @@
+import { DUPLICATE_CODE } from 'const';
 import { TypeORMError } from 'typeorm';
-
-const DUPLICATE_CODE = '23505';
 
 interface IDuplicateError extends TypeORMError {
   code: typeof DUPLICATE_CODE;
