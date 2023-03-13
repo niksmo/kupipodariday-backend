@@ -1,9 +1,10 @@
 import { IsOptional, IsUrl, Length, Matches } from 'class-validator';
-import { EMAIL_PATTERN, NAME_PATTERN, PASSWORD_PATTERN } from 'users/lib';
+import { EMAIL_PATTERN, USERNAME_PATTERN, PASSWORD_PATTERN } from 'users/lib';
 
 export class CreateUserDto {
-  @Matches(NAME_PATTERN, {
-    message: 'Имя пользователя должно быть на латинском от 2 до 30 символов',
+  @Matches(USERNAME_PATTERN, {
+    message:
+      'Имя пользователя должно быть строчными латинскими буквами от 2 до 30 символов',
   })
   readonly username: string;
 

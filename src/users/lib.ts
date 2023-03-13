@@ -8,7 +8,7 @@ export async function hashPassword(createUserDto: CreateUserDto) {
   return createUserDto;
 }
 
-export const NAME_PATTERN = /^[a-z\-_]{2,30}$/;
+export const USERNAME_PATTERN = /^[a-z\-_]{2,30}$/;
 
 export const PASSWORD_PATTERN =
   // eslint-disable-next-line no-useless-escape

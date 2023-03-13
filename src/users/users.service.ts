@@ -12,12 +12,12 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>
   ) {}
 
-  async findByName(username: string) {
-    return await this.usersRepository.findOneBy({ username });
+  findByName(username: string) {
+    return this.usersRepository.findOneBy({ username });
   }
 
-  async findByEmail(email: string) {
-    return await this.usersRepository.findOneBy({ email });
+  findByEmail(email: string) {
+    return this.usersRepository.findOneBy({ email });
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {

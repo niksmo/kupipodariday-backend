@@ -8,28 +8,42 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { NotFoundExeption } from 'exeptions';
-import { ExcludePasswordInterceptor } from 'interceptors';
+import {
+  ExcludeEmailInterceptor,
+  ExcludePasswordInterceptor,
+} from 'interceptors';
 import { CreateUserDto } from './dto/create-user.dto';
+import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
+import { FindUserByNameDto } from './dto/find-user-by-name.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
-@UseInterceptors(ExcludePasswordInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post('signup')
+  @Post('signup') // relocate in auth module
+  @UseInterceptors(ExcludePasswordInterceptor)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
-  @Get(':username')
-  async findUserByName(@Param('username') username: string) {
-    const user = await this.usersService.findByName(username);
+  @Get('find')
+  @UseInterceptors(ExcludePasswordInterceptor)
+  async findUserByEmail(@Query() findUserByEmailDto: FindUserByEmailDto) {
+    const user = await this.usersService.findByEmail(findUserByEmailDto.email);
+    if (!user) {
+      throw new NotFoundExeption('Пользователь с таким email не найден');
+    }
+    return user;
+  }
 
+  @Get(':username')
+  @UseInterceptors(ExcludeEmailInterceptor, ExcludePasswordInterceptor)
+  async findUserByName(@Param() findUserByNameDto: FindUserByNameDto) {
+    const user = await this.usersService.findByName(findUserByNameDto.username);
     if (!user) {
       throw new NotFoundExeption('Пользователь с таким именем не найден');
     }
-
     return user;
   }
 }
