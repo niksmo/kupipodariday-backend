@@ -4,13 +4,20 @@ import * as bcrypt from 'bcrypt';
 export async function hashPassword(
   createUserDto: CreateUserDto,
   saltOrRounds: string | number
-) {
+): Promise<CreateUserDto> {
   const hashedPassword = await bcrypt.hash(
     createUserDto.password,
     saltOrRounds
   );
   createUserDto.password = hashedPassword;
   return createUserDto;
+}
+
+export function compareWithHash(
+  password: string,
+  hashedPassword: string
+): Promise<boolean> {
+  return bcrypt.compare(password, hashedPassword);
 }
 
 export const USERNAME_PATTERN = /^[a-z\-_]{2,30}$/;

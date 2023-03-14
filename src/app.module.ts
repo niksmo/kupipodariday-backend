@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from 'auth/auth.module';
 import { appConfig } from 'config/app-config';
 import { OffersModule } from './offers/offers.module';
 import { UsersModule } from './users/users.module';
@@ -16,6 +17,7 @@ import { WishListsModule } from './wishlists/wishlists.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    AuthModule,
     UsersModule,
     WishesModule,
     WishListsModule,
