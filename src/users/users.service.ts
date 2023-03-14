@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isDuplicateError, KeyDuplicateExeption } from 'exeptions';
+import { TAppConfig } from 'config/app-config';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
@@ -9,7 +10,8 @@ import { hashPassword } from './lib';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private usersRepository: Repository<User>
+    @InjectRepository(User) private usersRepository: Repository<User>,
+    private configService: ConfigService<TAppConfig, true>
   ) {}
 
   findByName(username: string) {
@@ -21,17 +23,7 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    try {
-      await hashPassword(createUserDto);
-      const user = await this.usersRepository.save(createUserDto);
-      return user;
-    } catch (error) {
-      if (isDuplicateError(error)) {
-        throw new KeyDuplicateExeption(
-          'Пользователь с таким email или именем уже зарегистрирован'
-        );
-      }
-      throw error;
-    }
+    await hashPassword(createUserDto, this.configService.get('hashRounds'));
+    return await this.usersRepository.save(createUserDto);
   }
 }
