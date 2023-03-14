@@ -4,7 +4,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export abstract class CommonColumns {
+export abstract class DatabaseTable {
   @PrimaryGeneratedColumn()
   id: number;
 

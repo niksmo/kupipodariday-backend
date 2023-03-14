@@ -1,11 +1,11 @@
-import { CommonColumns } from 'data-base/common.entity';
+import { DatabaseTable } from 'data-source/database-table';
 import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { User } from 'users/entities/user.entity';
 import { WishList } from 'wishlists/entities/wishlist.entity';
 
 @Entity()
-export class Wish extends CommonColumns {
+export class Wish extends DatabaseTable {
   @Column({ type: 'varchar', length: 250 })
   name: string;
 
