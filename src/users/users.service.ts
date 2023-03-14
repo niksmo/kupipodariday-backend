@@ -14,11 +14,15 @@ export class UsersService {
     private configService: ConfigService<TAppConfig, true>
   ) {}
 
-  findByName(username: string) {
+  findById(userId: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ id: userId });
+  }
+
+  findByName(username: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ username });
   }
 
-  findByEmail(email: string) {
+  findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ email });
   }
 
