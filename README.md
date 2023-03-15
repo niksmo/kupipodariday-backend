@@ -20,4 +20,6 @@ TypeORM
   POSTGRES_DB=kupipodariday
   POSTGRES_USER=student
   POSTGRES_PASSWORD=student
+  JWT_SECRET=jwt-secret
+  HASH_SALT=10
 - Командой `npm run start` запустите проект.
