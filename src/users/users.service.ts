@@ -26,6 +26,19 @@ export class UsersService {
     return this.usersRepository.findOneBy({ email });
   }
 
+  async findByNameOrEmail(
+    username: string,
+    email: string
+  ): Promise<User[] | null> {
+    const users = await this.usersRepository.find({
+      where: [{ username }, { email }],
+    });
+    if (users.length === 0) {
+      return null;
+    }
+    return users;
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
     await hashPassword(createUserDto, this.configService.get('hashRounds'));
     return await this.usersRepository.save(createUserDto);

@@ -13,20 +13,15 @@ export class AuthService {
   ) {}
 
   async registerUser(signupDto: SignupDto) {
-    let isExist = await this.usersService.findByName(signupDto.username);
-
-    const CONFLICT_MESSAGE = {
-      message: 'Пользователь с таким именем или email уже зарегистрирован',
-    };
-
-    if (isExist) {
-      throw new ConflictException(CONFLICT_MESSAGE);
-    }
-
-    isExist = await this.usersService.findByEmail(signupDto.email);
+    const isExist = await this.usersService.findByNameOrEmail(
+      signupDto.username,
+      signupDto.email
+    );
 
     if (isExist) {
-      throw new ConflictException(CONFLICT_MESSAGE);
+      throw new ConflictException({
+        message: 'Пользователь с таким именем или email уже зарегистрирован',
+      });
     }
 
     return this.usersService.create(signupDto);
