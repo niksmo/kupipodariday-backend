@@ -29,7 +29,7 @@ export class AuthService {
 
   async authorizeUser(userId: TUserId) {
     const accessToken = this.jwtService.sign({ sub: userId });
-    return { accessToken };
+    return { access_token: accessToken };
   }
 
   async validateUser(username: string, password: string) {

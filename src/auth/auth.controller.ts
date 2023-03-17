@@ -12,7 +12,7 @@ import { ExcludePasswordInterceptor } from 'interceptors';
 import { User } from 'decorators/user.decorator';
 import { TUser } from 'users/types';
 
-@Controller('auth')
+@Controller()
 export class AuthController {
   constructor(private authService: AuthService) {}
 
