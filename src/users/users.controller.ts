@@ -4,6 +4,7 @@ import {
   NotFoundException,
   Param,
   Query,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,13 +15,14 @@ import {
 } from 'interceptors';
 import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
 import { FindUserByNameDto } from './dto/find-user-by-name.dto';
+import { RequestWithUser } from './types';
 import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('find')
+  @Get('find') //вернуться к этому роуту, т.к. тут явно нужен POST как в свагере
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ExcludePasswordInterceptor)
   async findUserByEmail(@Query() findUserByEmailDto: FindUserByEmailDto) {
@@ -31,6 +33,13 @@ export class UsersController {
       });
     }
     return user;
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ExcludePasswordInterceptor)
+  getViewerInfo(@Req() req: RequestWithUser) {
+    return this.usersService.findById(req.user.id);
   }
 
   @Get(':username')
