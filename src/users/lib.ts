@@ -5,11 +5,13 @@ export async function hashPassword(
   createUserDto: CreateUserDto,
   saltOrRounds: string | number
 ): Promise<CreateUserDto> {
-  const hashedPassword = await bcrypt.hash(
-    createUserDto.password,
-    saltOrRounds
-  );
-  createUserDto.password = hashedPassword;
+  if (createUserDto.password) {
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      saltOrRounds
+    );
+    createUserDto.password = hashedPassword;
+  }
   return createUserDto;
 }
 

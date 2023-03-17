@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Post,
-  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -10,7 +9,8 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from 'guards/local.guard';
 import { SignupDto } from './dto/signup.dto';
 import { ExcludePasswordInterceptor } from 'interceptors';
-import { RequestWithUser } from 'users/types';
+import { User } from 'decorators/user.decorator';
+import { TUser } from 'users/types';
 
 @Controller('auth')
 export class AuthController {
@@ -18,9 +18,8 @@ export class AuthController {
 
   @Post('signin')
   @UseGuards(LocalAuthGuard)
-  signin(@Req() req: RequestWithUser) {
-    const userId = req.user.id;
-    return this.authService.authorizeUser(userId);
+  signin(@User() user: TUser) {
+    return this.authService.authorizeUser(user.id);
   }
 
   @Post('signup')

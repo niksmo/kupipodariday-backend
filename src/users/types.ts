@@ -1,8 +1,15 @@
-import { Request } from 'express';
-import { User } from './entities/user.entity';
+import { TDatabaseTable } from 'data-source/database-table';
 
-export type TUserId = string;
+type TRelation = 'wishes' | 'offers' | 'wishlists';
 
-export interface RequestWithUser extends Request {
-  user: User;
-}
+type TRelationsType = { [key in TRelation]?: unknown } | unknown;
+
+export type TUser<R extends TRelationsType = unknown> = TDatabaseTable & {
+  username: string;
+  about: string;
+  avatar: string;
+  email: string;
+  password: string;
+} & R;
+
+export type TUserId = TUser['id'];

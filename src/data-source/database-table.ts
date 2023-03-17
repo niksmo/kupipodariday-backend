@@ -14,3 +14,5 @@ export abstract class DatabaseTable {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
+export type TDatabaseTable = InstanceType<typeof DatabaseTable>;
