@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'users/users.service';
-import { TUserId } from 'users/types';
+import { TUserId } from 'users/entities/types';
 import { TAppConfig } from 'config/app-config';
 
 interface IJwtPayload {

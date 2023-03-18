@@ -1,7 +1,7 @@
 import { DatabaseTable } from 'data-source/database-table';
 import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
-import { TUser } from 'users/types';
+import { TUser } from 'users/entities/types';
 import { Wish } from 'wishes/entities/wish.entity';
 import { WishList } from 'wishlists/entities/wishlist.entity';
 

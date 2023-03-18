@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compareWithHash } from 'users/lib';
-import { TUserId } from 'users/types';
+import { TUserId } from 'users/entities/types';
 import { UsersService } from 'users/users.service';
 import { SignupDto } from './dto/signup.dto';
 

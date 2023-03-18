@@ -18,7 +18,7 @@ import {
 import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
 import { FindUserByNameDto } from './dto/find-user-by-name.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
-import { TUser } from './types';
+import { TUser } from './entities/types';
 import { UsersService } from './users.service';
 
 @Controller('users')

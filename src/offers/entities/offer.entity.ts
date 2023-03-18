@@ -11,7 +11,7 @@ export class Offer extends DatabaseTable {
   @ManyToOne(() => Wish, (wish) => wish.offers)
   item: Wish; // relation
 
-  @Column({ type: 'numeric', precision: 9, scale: 2 })
+  @Column({ type: 'real' })
   amount: number;
 
   @Column({ type: 'boolean', default: 'false' })

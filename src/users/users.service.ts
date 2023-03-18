@@ -7,7 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
 import { User } from './entities/user.entity';
 import { hashPassword } from './lib';
-import { TUser, TUserId } from './types';
+import { TUser, TUserId } from './entities/types';
 
 @Injectable()
 export class UsersService {
