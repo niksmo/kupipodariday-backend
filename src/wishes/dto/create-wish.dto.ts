@@ -1,5 +1,5 @@
 import { IsNumber, IsUrl, Length } from 'class-validator';
-import { roundToHundredths, specifyMessage } from 'utils';
+import { specifyMessage } from 'utils';
 
 export class CreateWishDto {
   @Length(
@@ -24,8 +24,4 @@ export class CreateWishDto {
     specifyMessage('Описание подарка должно быть от 1 и до 1024 символов')
   )
   readonly description: string;
-
-  roundPrice() {
-    this.price = roundToHundredths(this.price);
-  }
 }

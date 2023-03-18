@@ -15,6 +15,7 @@ import {
   ExcludeEmailInterceptor,
   ExcludePasswordInterceptor,
 } from 'interceptors';
+import { isEmptyBody } from 'utils';
 import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
 import { FindUserByNameDto } from './dto/find-user-by-name.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
@@ -47,8 +48,7 @@ export class UsersController {
   @Patch('me')
   @UseInterceptors(ExcludePasswordInterceptor)
   updateViewer(@Body() updateViewerDto: UpdateViewerDto, @User() user: TUser) {
-    const isEmptyBody = Object.keys(updateViewerDto).length === 0;
-    if (isEmptyBody) {
+    if (isEmptyBody(updateViewerDto)) {
       return user;
     }
     return this.usersService.update(updateViewerDto, user.id);
