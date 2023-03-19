@@ -5,8 +5,8 @@ import {
 } from 'typeorm';
 
 export abstract class DatabaseTable {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @CreateDateColumn()
   createdAt: Date;

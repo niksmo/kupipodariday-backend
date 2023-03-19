@@ -16,7 +16,6 @@ import { SensitiveOwnerDataInterceptor } from 'interceptors';
 import { IUser } from 'users/entities/types';
 import { isEmptyBody, specifyMessage } from 'utils';
 import { CreateWishDto } from './dto/create-wish.dto';
-import { FindOneWishParams } from './dto/find-one-wish-params.dto';
 import { UpdateWishByIdDto } from './dto/update-wish-by-id..dto';
 import { WishesService } from './wishes.service';
 
@@ -34,9 +33,9 @@ export class WishesController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(SensitiveOwnerDataInterceptor)
-  findWish(@Param() param: FindOneWishParams) {
+  findWish(@Param('id') id: number) {
     return this.wishesService.findOne({
-      where: { id: param.id },
+      where: { id },
       relations: { owner: true, offers: true },
     });
   }
@@ -44,7 +43,7 @@ export class WishesController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   updateWish(
-    @Param() param: FindOneWishParams,
+    @Param('id') id: number,
     @Body() updateWishDto: UpdateWishByIdDto,
     @User() user: IUser
   ) {
@@ -53,12 +52,12 @@ export class WishesController {
         specifyMessage('Не указано ни одно параметра')
       );
     }
-    return this.wishesService.updateByOwner(param.id, updateWishDto, user);
+    return this.wishesService.updateByOwner(id, updateWishDto, user);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  deleteWish(@Param() param: FindOneWishParams, @User() user: IUser) {
-    return this.wishesService.removeByOwner(param.id, user.id);
+  deleteWish(@Param('id') id: number, @User() user: IUser) {
+    return this.wishesService.removeByOwner(id, user.id);
   }
 }
