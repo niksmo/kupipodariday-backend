@@ -43,7 +43,7 @@ export class UsersController {
     if (isEmptyBody(updateViewerDto)) {
       return user;
     }
-    return this.usersService.updateByOwner(updateViewerDto, user.id);
+    return this.usersService.updateByOwner(updateViewerDto, user);
   }
 
   @Get(':username')

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TAppConfig } from 'config/app-config';
@@ -7,7 +7,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
 import { User } from './entities/user.entity';
 import { hashPassword } from './lib';
-import { IUser, TUserId } from './entities/types';
+import { IUser } from './entities/types';
+import { specifyMessage } from 'utils';
 
 @Injectable()
 export class UsersService {
@@ -31,10 +32,37 @@ export class UsersService {
 
   async updateByOwner(
     updateViewerDto: UpdateViewerDto,
-    userId: TUserId
+    user: IUser
   ): Promise<IUser | null> {
+    if (
+      updateViewerDto.username &&
+      updateViewerDto.username !== user.username
+    ) {
+      const isExistUsername = await this.findOne({
+        where: { username: updateViewerDto.username },
+      });
+
+      if (isExistUsername) {
+        throw new ConflictException(
+          specifyMessage('Пользователь с таким именем уже зарегистрирован')
+        );
+      }
+    }
+
+    if (updateViewerDto.email && updateViewerDto.email !== user.email) {
+      const isExistEmail = await this.findOne({
+        where: { email: updateViewerDto.email },
+      });
+
+      if (isExistEmail) {
+        throw new ConflictException(
+          specifyMessage('Пользователь с таким email уже зарегистрирован')
+        );
+      }
+    }
+
     await hashPassword(updateViewerDto, this.configService.get('hashRounds'));
-    await this.updateOne({ id: userId }, updateViewerDto);
-    return this.findOne({ where: { id: userId } });
+    await this.updateOne({ id: user.id }, updateViewerDto);
+    return this.findOne({ where: { id: user.id } });
   }
 }
