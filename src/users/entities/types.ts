@@ -1,15 +1,17 @@
 import { TDatabaseTable } from 'data-source/database-table';
+import { IOffer } from 'offers/entities/types';
+import { IWish } from 'wishes/entities/types';
+import { IWishlist } from 'wishlists/entities/types';
 
-type TRelation = 'wishes' | 'offers' | 'wishlists';
-
-type TRelationsType = { [key in TRelation]?: unknown } | unknown;
-
-export type TUser<R extends TRelationsType = unknown> = TDatabaseTable & {
+export interface IUser extends TDatabaseTable {
   username: string;
   about: string;
   avatar: string;
   email: string;
   password: string;
-} & R;
+  wishes: IWish[];
+  offers: IOffer[];
+  wishlists: IWishlist[];
+}
 
-export type TUserId = TUser['id'];
+export type TUserId = IUser['id'];

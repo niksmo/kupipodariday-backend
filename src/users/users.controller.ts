@@ -15,11 +15,11 @@ import {
   ExcludeEmailInterceptor,
   ExcludePasswordInterceptor,
 } from 'interceptors';
-import { isEmptyBody } from 'utils';
+import { isEmptyBody, specifyMessage } from 'utils';
 import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
 import { FindUserByNameDto } from './dto/find-user-by-name.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
-import { TUser } from './entities/types';
+import { IUser } from './entities/types';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -32,22 +32,22 @@ export class UsersController {
   async findUserByEmail(@Query() findUserByEmailDto: FindUserByEmailDto) {
     const user = await this.usersService.findByEmail(findUserByEmailDto.email);
     if (!user) {
-      throw new NotFoundException({
-        message: 'Пользователь с таким email не найден',
-      });
+      throw new NotFoundException(
+        specifyMessage('Пользователь с таким email не найден')
+      );
     }
     return user;
   }
 
   @Get('me')
   @UseInterceptors(ExcludePasswordInterceptor)
-  getViewer(@User() user: TUser) {
+  getViewer(@User() user: IUser) {
     return this.usersService.findById(user.id);
   }
 
   @Patch('me')
   @UseInterceptors(ExcludePasswordInterceptor)
-  updateViewer(@Body() updateViewerDto: UpdateViewerDto, @User() user: TUser) {
+  updateViewer(@Body() updateViewerDto: UpdateViewerDto, @User() user: IUser) {
     if (isEmptyBody(updateViewerDto)) {
       return user;
     }
@@ -59,9 +59,9 @@ export class UsersController {
   async findUserByName(@Param() findUserByNameDto: FindUserByNameDto) {
     const user = await this.usersService.findByName(findUserByNameDto.username);
     if (!user) {
-      throw new NotFoundException({
-        message: 'Пользователь с таким именем не найден',
-      });
+      throw new NotFoundException(
+        specifyMessage('Пользователь с таким именем не найден')
+      );
     }
     return user;
   }

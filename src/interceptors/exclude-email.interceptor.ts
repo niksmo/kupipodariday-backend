@@ -10,7 +10,7 @@ import { map } from 'rxjs';
 export class ExcludeEmailInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
-      map((data) => {
+      map<{ email?: string }, unknown>((data) => {
         delete data.email;
         return data;
       })

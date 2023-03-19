@@ -1,10 +1,9 @@
 import { TDatabaseTable } from 'data-source/database-table';
+import { IOffer } from 'offers/entities/types';
+import { IUser } from 'users/entities/types';
+import { IWishlist } from 'wishlists/entities/types';
 
-type TRelation = 'owner' | 'offers' | 'wishLists';
-
-type TRelationsType = { [key in TRelation]?: unknown } | unknown;
-
-export type TWish<R extends TRelationsType = unknown> = TDatabaseTable & {
+export interface IWish extends TDatabaseTable {
   name: string;
   link: string;
   image: string;
@@ -12,6 +11,9 @@ export type TWish<R extends TRelationsType = unknown> = TDatabaseTable & {
   description: string;
   raised: number;
   copied: number;
-} & R;
+  owner?: IUser;
+  offers?: IOffer[];
+  wishlists?: IWishlist[];
+}
 
-export type TWishId = TWish['id'];
+export type TWishId = IWish['id'];

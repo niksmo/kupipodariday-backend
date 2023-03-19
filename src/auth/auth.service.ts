@@ -4,6 +4,7 @@ import { compareWithHash } from 'users/lib';
 import { TUserId } from 'users/entities/types';
 import { UsersService } from 'users/users.service';
 import { SignupDto } from './dto/signup.dto';
+import { specifyMessage } from 'utils';
 
 @Injectable()
 export class AuthService {
@@ -19,9 +20,11 @@ export class AuthService {
     );
 
     if (isExist) {
-      throw new ConflictException({
-        message: 'Пользователь с таким именем или email уже зарегистрирован',
-      });
+      throw new ConflictException(
+        specifyMessage(
+          'Пользователь с таким именем или email уже зарегистрирован'
+        )
+      );
     }
 
     return this.usersService.create(signupDto);

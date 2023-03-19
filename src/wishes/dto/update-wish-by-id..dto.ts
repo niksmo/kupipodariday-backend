@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsUrl, IsUUID, Length } from 'class-validator';
+import { IsNumber, IsOptional, IsUrl, Length } from 'class-validator';
 import { specifyMessage } from 'utils';
 
 export class UpdateWishByIdDto {

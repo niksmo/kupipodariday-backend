@@ -3,14 +3,10 @@ import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { User } from 'users/entities/user.entity';
 import { WishList } from 'wishlists/entities/wishlist.entity';
-import { TWish } from './types';
+import { IWish } from './types';
 
 @Entity()
-export class Wish
-  extends DatabaseTable
-  implements
-    Required<TWish<{ owner: User; offers: Offer[]; wishLists: WishList[] }>>
-{
+export class Wish extends DatabaseTable implements IWish {
   @Column({ type: 'varchar', length: 250 })
   name: string;
 
@@ -39,5 +35,5 @@ export class Wish
   offers: Offer[]; // relation
 
   @ManyToMany(() => WishList, (wishList) => wishList.items)
-  wishLists: WishList[]; // additional relation
+  wishlists: WishList[]; // additional relation
 }

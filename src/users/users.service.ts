@@ -7,7 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
 import { User } from './entities/user.entity';
 import { hashPassword } from './lib';
-import { TUser, TUserId } from './entities/types';
+import { IUser, TUserId } from './entities/types';
 
 @Injectable()
 export class UsersService {
@@ -16,22 +16,22 @@ export class UsersService {
     private configService: ConfigService<TAppConfig, true>
   ) {}
 
-  findById(userId: string): Promise<TUser | null> {
+  findById(userId: string): Promise<IUser | null> {
     return this.usersRepository.findOneBy({ id: userId });
   }
 
-  findByName(username: string): Promise<TUser | null> {
+  findByName(username: string): Promise<IUser | null> {
     return this.usersRepository.findOneBy({ username });
   }
 
-  findByEmail(email: string): Promise<TUser | null> {
+  findByEmail(email: string): Promise<IUser | null> {
     return this.usersRepository.findOneBy({ email });
   }
 
   async findByNameOrEmail(
     username: string,
     email: string
-  ): Promise<TUser[] | null> {
+  ): Promise<IUser[] | null> {
     const users = await this.usersRepository.find({
       where: [{ username }, { email }],
     });
@@ -41,7 +41,7 @@ export class UsersService {
     return users;
   }
 
-  async create(createUserDto: CreateUserDto): Promise<TUser | null> {
+  async create(createUserDto: CreateUserDto): Promise<IUser | null> {
     await hashPassword(createUserDto, this.configService.get('hashRounds'));
     return await this.usersRepository.save(createUserDto);
   }
@@ -49,7 +49,7 @@ export class UsersService {
   async update(
     updateViewerDto: UpdateViewerDto,
     userId: TUserId
-  ): Promise<TUser | null> {
+  ): Promise<IUser | null> {
     await hashPassword(updateViewerDto, this.configService.get('hashRounds'));
     await this.usersRepository.update(userId, updateViewerDto);
     return this.usersRepository.findOneBy({ id: userId });

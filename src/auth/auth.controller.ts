@@ -10,7 +10,7 @@ import { LocalAuthGuard } from 'guards/local.guard';
 import { SignupDto } from './dto/signup.dto';
 import { ExcludePasswordInterceptor } from 'interceptors';
 import { User } from 'decorators/user.decorator';
-import { TUser } from 'users/entities/types';
+import { IUser } from 'users/entities/types';
 
 @Controller()
 export class AuthController {
@@ -18,7 +18,7 @@ export class AuthController {
 
   @Post('signin')
   @UseGuards(LocalAuthGuard)
-  signin(@User() user: TUser) {
+  signin(@User() user: IUser) {
     return this.authService.authorizeUser(user.id);
   }
 

@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'users/users.service';
 import { TUserId } from 'users/entities/types';
 import { TAppConfig } from 'config/app-config';
+import { specifyMessage } from 'utils';
 
 interface IJwtPayload {
   sub: TUserId;
@@ -28,9 +29,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = this.usersService.findById(payload.sub);
 
     if (!user) {
-      throw new UnauthorizedException({
-        message: 'Пользователь не авторизован',
-      });
+      throw new UnauthorizedException(
+        specifyMessage('Пользователь не авторизован')
+      );
     }
 
     return user;

@@ -12,7 +12,7 @@ import {
 import { User } from 'decorators/user.decorator';
 import { JwtAuthGuard } from 'guards/jwt.guard';
 import { SensitiveOwnerDataInterceptor } from 'interceptors';
-import { TUser } from 'users/entities/types';
+import { IUser } from 'users/entities/types';
 import { isEmptyBody, specifyMessage } from 'utils';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { FindOneWishParams } from './dto/find-one-wish-params.dto';
@@ -26,28 +26,28 @@ export class WishesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  createWish(@Body() createWishDto: CreateWishDto, @User() user: TUser) {
+  createWish(@Body() createWishDto: CreateWishDto, @User() user: IUser) {
     return this.wishesService.create(createWishDto, user);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   findWish(@Param() param: FindOneWishParams) {
-    return this.wishesService.findOneWithOwner(param.id);
+    return this.wishesService.findOne(param.id);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   updateWish(
     @Param() param: FindOneWishParams,
-    @Body() updateWishByIdDto: UpdateWishByIdDto,
-    @User() user: TUser
+    @Body() updateWishDto: UpdateWishByIdDto,
+    @User() user: IUser
   ) {
-    if (isEmptyBody(updateWishByIdDto)) {
+    if (isEmptyBody(updateWishDto)) {
       throw new BadRequestException(
         specifyMessage('Не указано ни одно параметра')
       );
     }
-    return this.wishesService.updateByOwner(param.id, updateWishByIdDto, user);
+    return this.wishesService.updateByOwner(param.id, updateWishDto, user);
   }
 }

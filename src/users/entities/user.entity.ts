@@ -1,16 +1,12 @@
 import { DatabaseTable } from 'data-source/database-table';
 import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
-import { TUser } from 'users/entities/types';
 import { Wish } from 'wishes/entities/wish.entity';
 import { WishList } from 'wishlists/entities/wishlist.entity';
+import { IUser } from './types';
 
 @Entity()
-export class User
-  extends DatabaseTable
-  implements
-    Required<TUser<{ wishes: Wish[]; offers: Offer[]; wishlists: WishList[] }>>
-{
+export class User extends DatabaseTable implements IUser {
   @Column({ type: 'varchar', length: 30, unique: true })
   username: string;
 
