@@ -5,7 +5,7 @@ import {
   NotFoundException,
   Param,
   Patch,
-  Query,
+  Post,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,7 +16,6 @@ import {
   ExcludePasswordInterceptor,
 } from 'interceptors';
 import { isEmptyBody, specifyMessage } from 'utils';
-import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
 import { FindUserByNameDto } from './dto/find-user-by-name.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
 import { IUser } from './entities/types';
@@ -27,22 +26,15 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('find') //вернуться к этому роуту, т.к. тут явно нужен POST как в свагере
-  @UseInterceptors(ExcludePasswordInterceptor)
-  async findUserByEmail(@Query() findUserByEmailDto: FindUserByEmailDto) {
-    const user = await this.usersService.findByEmail(findUserByEmailDto.email);
-    if (!user) {
-      throw new NotFoundException(
-        specifyMessage('Пользователь с таким email не найден')
-      );
-    }
-    return user;
+  @Post('find') //вернуться к этому роуту, т.к. тут явно нужен POST как в свагере
+  async findUsers() {
+    return null;
   }
 
   @Get('me')
   @UseInterceptors(ExcludePasswordInterceptor)
   getViewer(@User() user: IUser) {
-    return this.usersService.findById(user.id);
+    return this.usersService.findOne({ where: { id: user.id } });
   }
 
   @Patch('me')
@@ -51,13 +43,15 @@ export class UsersController {
     if (isEmptyBody(updateViewerDto)) {
       return user;
     }
-    return this.usersService.update(updateViewerDto, user.id);
+    return this.usersService.updateByOwner(updateViewerDto, user.id);
   }
 
   @Get(':username')
   @UseInterceptors(ExcludeEmailInterceptor, ExcludePasswordInterceptor)
   async findUserByName(@Param() findUserByNameDto: FindUserByNameDto) {
-    const user = await this.usersService.findByName(findUserByNameDto.username);
+    const user = await this.usersService.findOne({
+      where: { username: findUserByNameDto.username },
+    });
     if (!user) {
       throw new NotFoundException(
         specifyMessage('Пользователь с таким именем не найден')

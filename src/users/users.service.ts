@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TAppConfig } from 'config/app-config';
-import { Repository } from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
 import { User } from './entities/user.entity';
@@ -16,42 +16,25 @@ export class UsersService {
     private configService: ConfigService<TAppConfig, true>
   ) {}
 
-  findById(userId: string): Promise<IUser | null> {
-    return this.usersRepository.findOneBy({ id: userId });
-  }
-
-  findByName(username: string): Promise<IUser | null> {
-    return this.usersRepository.findOneBy({ username });
-  }
-
-  findByEmail(email: string): Promise<IUser | null> {
-    return this.usersRepository.findOneBy({ email });
-  }
-
-  async findByNameOrEmail(
-    username: string,
-    email: string
-  ): Promise<IUser[] | null> {
-    const users = await this.usersRepository.find({
-      where: [{ username }, { email }],
-    });
-    if (users.length === 0) {
-      return null;
-    }
-    return users;
-  }
-
   async create(createUserDto: CreateUserDto): Promise<IUser | null> {
     await hashPassword(createUserDto, this.configService.get('hashRounds'));
     return await this.usersRepository.save(createUserDto);
   }
 
-  async update(
+  findOne(query: FindOneOptions<User>) {
+    return this.usersRepository.findOne(query);
+  }
+
+  updateOne(query: FindOptionsWhere<User>, updateViewerDto: UpdateViewerDto) {
+    return this.usersRepository.update(query, updateViewerDto);
+  }
+
+  async updateByOwner(
     updateViewerDto: UpdateViewerDto,
     userId: TUserId
   ): Promise<IUser | null> {
     await hashPassword(updateViewerDto, this.configService.get('hashRounds'));
-    await this.usersRepository.update(userId, updateViewerDto);
-    return this.usersRepository.findOneBy({ id: userId });
+    await this.updateOne({ id: userId }, updateViewerDto);
+    return this.findOne({ where: { id: userId } });
   }
 }

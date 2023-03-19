@@ -14,10 +14,9 @@ export class AuthService {
   ) {}
 
   async registerUser(signupDto: SignupDto) {
-    const isExist = await this.usersService.findByNameOrEmail(
-      signupDto.username,
-      signupDto.email
-    );
+    const isExist = await this.usersService.findOne({
+      where: [{ username: signupDto.username }, { email: signupDto.email }],
+    });
 
     if (isExist) {
       throw new ConflictException(
@@ -36,7 +35,7 @@ export class AuthService {
   }
 
   async validateUser(username: string, password: string) {
-    const user = await this.usersService.findByName(username);
+    const user = await this.usersService.findOne({ where: { username } });
 
     if (!user) {
       return null;
