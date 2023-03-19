@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  Header,
   Param,
   Patch,
   Post,
@@ -33,7 +35,7 @@ export class WishesController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   findWish(@Param() param: FindOneWishParams) {
-    return this.wishesService.findOne(param.id);
+    return this.wishesService.findOne({ id: param.id });
   }
 
   @Patch(':id')
@@ -49,5 +51,11 @@ export class WishesController {
       );
     }
     return this.wishesService.updateByOwner(param.id, updateWishDto, user);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  deleteWish(@Param() param: FindOneWishParams, @User() user: IUser) {
+    return this.wishesService.removeByOwner(param.id, user.id);
   }
 }

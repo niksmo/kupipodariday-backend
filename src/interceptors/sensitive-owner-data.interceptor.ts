@@ -18,6 +18,7 @@ export class SensitiveOwnerDataInterceptor implements NestInterceptor {
             data.owner;
           return { ...data, owner: interceptedOwner };
         }
+        return data;
       })
     );
   }

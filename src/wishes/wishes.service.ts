@@ -1,16 +1,21 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { IUser } from 'users/entities/types';
+import { FindOptionsWhere, Repository } from 'typeorm';
+import { IUser, TUserId } from 'users/entities/types';
 import { roundToHundredths, specifyMessage } from 'utils';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishByIdDto } from './dto/update-wish-by-id..dto';
 import { IWish, TWishId } from './entities/types';
 import { Wish } from './entities/wish.entity';
+
+class TestResponse {
+  constructor(public success: boolean, public message: string) {}
+}
 
 @Injectable()
 export class WishesService {
@@ -23,26 +28,35 @@ export class WishesService {
     return this.wishesRepository.save({ ...createWishDto, owner: user });
   }
 
-  findOne(wishId: TWishId): Promise<IWish | null> {
-    return this.wishesRepository.findOne({
-      where: { id: wishId },
+  async findOne(query: FindOptionsWhere<Wish>): Promise<IWish> {
+    const wish = await this.wishesRepository.findOne({
+      where: query,
       relations: { owner: true, offers: true },
     });
+
+    if (wish === null) {
+      throw new NotFoundException(specifyMessage('Подарок не найден'));
+    }
+    return wish;
   }
 
   async updateOne(
-    wishId: TWishId,
+    query: FindOptionsWhere<Wish>,
     updateWishDto: UpdateWishByIdDto
   ): Promise<IWish | null> {
-    await this.wishesRepository.update(wishId, updateWishDto);
+    await this.wishesRepository.update(query, updateWishDto);
     return this.wishesRepository.findOne({
-      where: { id: wishId },
+      where: query,
       relations: { owner: true, offers: true },
     });
   }
 
-  removeOne(wishId: TWishId) {
-    return this.wishesRepository.delete({ id: wishId });
+  async removeOne(query: FindOptionsWhere<Wish>) {
+    const result = await this.wishesRepository.delete(query);
+    if (result.affected === 0) {
+      throw new NotFoundException(specifyMessage('Подарок не найден'));
+    }
+    return new TestResponse(true, 'Подарок удален');
   }
 
   async updateByOwner(
@@ -50,14 +64,10 @@ export class WishesService {
     updateWishByIdDto: UpdateWishByIdDto,
     user: IUser
   ) {
-    const storedWish = await this.wishesRepository.findOne({
-      where: { id: wishId, owner: { id: user.id } },
-      relations: { owner: true, offers: true },
+    const storedWish = await this.findOne({
+      id: wishId,
+      owner: { id: user.id },
     });
-
-    if (!storedWish) {
-      throw new NotFoundException(specifyMessage('Не найден'));
-    }
 
     if (updateWishByIdDto.price && storedWish.raised !== 0) {
       throw new BadRequestException(
@@ -67,6 +77,17 @@ export class WishesService {
       );
     }
 
-    return this.updateOne(wishId, updateWishByIdDto);
+    const updatedWish = await this.updateOne({ id: wishId }, updateWishByIdDto);
+
+    if (updatedWish === null) {
+      throw new InternalServerErrorException(
+        specifyMessage('Не удалось обновить запись')
+      );
+    }
+    return updatedWish;
+  }
+
+  removeByOwner(wishId: TWishId, userId: TUserId) {
+    return this.removeOne({ id: wishId, owner: { id: userId } });
   }
 }
