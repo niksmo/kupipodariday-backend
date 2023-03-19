@@ -12,10 +12,12 @@ import {
 import { User } from 'decorators/user.decorator';
 import { JwtAuthGuard } from 'guards/jwt.guard';
 import {
-  ExcludeEmailInterceptor,
-  ExcludePasswordInterceptor,
+  ExcludeUserEmailInterceptor,
+  ExcludeUserPasswordInterceptor,
+  SensitiveOwnerDataInterceptor,
 } from 'interceptors';
 import { isEmptyBody, specifyMessage } from 'utils';
+import { WishesService } from 'wishes/wishes.service';
 import { FindUserByNameDto } from './dto/find-user-by-name.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
 import { IUser } from './entities/types';
@@ -24,7 +26,10 @@ import { UsersService } from './users.service';
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly wishesService: WishesService
+  ) {}
 
   @Post('find') //вернуться к этому роуту, т.к. тут явно нужен POST как в свагере
   async findUsers() {
@@ -32,13 +37,22 @@ export class UsersController {
   }
 
   @Get('me')
-  @UseInterceptors(ExcludePasswordInterceptor)
+  @UseInterceptors(ExcludeUserPasswordInterceptor)
   getViewer(@User() user: IUser) {
     return this.usersService.findOne({ where: { id: user.id } });
   }
 
+  @Get('me/wishes')
+  @UseInterceptors(SensitiveOwnerDataInterceptor)
+  getViewerWishes(@User() user: IUser) {
+    return this.wishesService.findMany({
+      where: { owner: { id: user.id } },
+      relations: { owner: true, offers: true },
+    });
+  }
+
   @Patch('me')
-  @UseInterceptors(ExcludePasswordInterceptor)
+  @UseInterceptors(ExcludeUserPasswordInterceptor)
   updateViewer(@Body() updateViewerDto: UpdateViewerDto, @User() user: IUser) {
     if (isEmptyBody(updateViewerDto)) {
       return user;
@@ -47,7 +61,7 @@ export class UsersController {
   }
 
   @Get(':username')
-  @UseInterceptors(ExcludeEmailInterceptor, ExcludePasswordInterceptor)
+  @UseInterceptors(ExcludeUserEmailInterceptor, ExcludeUserPasswordInterceptor)
   async findUserByName(@Param() findUserByNameDto: FindUserByNameDto) {
     const user = await this.usersService.findOne({
       where: { username: findUserByNameDto.username },

@@ -21,18 +21,19 @@ import { UpdateWishByIdDto } from './dto/update-wish-by-id..dto';
 import { WishesService } from './wishes.service';
 
 @Controller('wishes')
-@UseInterceptors(SensitiveOwnerDataInterceptor)
 export class WishesController {
   constructor(private readonly wishesService: WishesService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(SensitiveOwnerDataInterceptor)
   createWish(@Body() createWishDto: CreateWishDto, @User() user: IUser) {
     return this.wishesService.create(createWishDto, user);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(SensitiveOwnerDataInterceptor)
   findWish(@Param() param: FindOneWishParams) {
     return this.wishesService.findOne({
       where: { id: param.id },

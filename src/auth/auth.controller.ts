@@ -8,7 +8,7 @@ import {
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from 'guards/local.guard';
 import { SignupDto } from './dto/signup.dto';
-import { ExcludePasswordInterceptor } from 'interceptors';
+import { ExcludeUserPasswordInterceptor } from 'interceptors';
 import { User } from 'decorators/user.decorator';
 import { IUser } from 'users/entities/types';
 
@@ -23,7 +23,7 @@ export class AuthController {
   }
 
   @Post('signup')
-  @UseInterceptors(ExcludePasswordInterceptor)
+  @UseInterceptors(ExcludeUserPasswordInterceptor)
   signup(@Body() signupDto: SignupDto) {
     return this.authService.registerUser(signupDto);
   }

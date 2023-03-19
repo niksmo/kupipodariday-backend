@@ -5,7 +5,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
 import { IUser, TUserId } from 'users/entities/types';
 import { ResultResponse, roundToHundredths, specifyMessage } from 'utils';
 import { CreateWishDto } from './dto/create-wish.dto';
@@ -31,6 +36,10 @@ export class WishesService {
       throw new NotFoundException(specifyMessage('Подарок не найден'));
     }
     return wish;
+  }
+
+  findMany(query: FindManyOptions<Wish>) {
+    return this.wishesRepository.find(query);
   }
 
   updateOne(query: FindOptionsWhere<Wish>, updateWishDto: UpdateWishByIdDto) {
