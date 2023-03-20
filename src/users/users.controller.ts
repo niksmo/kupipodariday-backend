@@ -20,7 +20,6 @@ import {
 } from 'interceptors';
 import { isEmptyBody, specifyMessage } from 'utils';
 import { WishesService } from 'wishes/wishes.service';
-import { FindUserByNameDto } from './dto/find-user-by-name.dto';
 import { FindUsersDto } from './dto/find-users.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
 import { IUser } from './entities/types';
@@ -67,9 +66,9 @@ export class UsersController {
 
   @Get(':username')
   @UseInterceptors(ExcludeUserEmailInterceptor, ExcludeUserPasswordInterceptor)
-  async findUserByName(@Param() findUserByNameDto: FindUserByNameDto) {
+  async findUserByName(@Param('username') username: string) {
     const user = await this.usersService.findOne({
-      where: { username: findUserByNameDto.username },
+      where: { username: username },
     });
     if (!user) {
       throw new NotFoundException(
@@ -77,5 +76,12 @@ export class UsersController {
       );
     }
     return user;
+  }
+
+  @Get(':username/wishes')
+  findUserWishes(@Param('username') username: string) {
+    return this.wishesService.findMany({
+      where: { owner: { username } },
+    });
   }
 }
