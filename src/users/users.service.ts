@@ -7,7 +7,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
 import { User } from './entities/user.entity';
 import { hashPassword } from './lib';
-import { IUser } from './entities/types';
 import { specifyMessage } from 'utils';
 
 @Injectable()
@@ -17,7 +16,7 @@ export class UsersService {
     private configService: ConfigService<TAppConfig, true>
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<IUser | null> {
+  async create(createUserDto: CreateUserDto): Promise<User | null> {
     await hashPassword(createUserDto, this.configService.get('hashRounds'));
     return await this.usersRepository.save(createUserDto);
   }
@@ -42,8 +41,8 @@ export class UsersService {
 
   async updateByOwner(
     updateViewerDto: UpdateViewerDto,
-    user: IUser
-  ): Promise<IUser | null> {
+    user: User
+  ): Promise<User | null> {
     if (
       updateViewerDto.username &&
       updateViewerDto.username !== user.username

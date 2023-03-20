@@ -1,10 +1,10 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compareWithHash } from 'users/lib';
-import { TUserId } from 'users/entities/types';
 import { UsersService } from 'users/users.service';
 import { SignupDto } from './dto/signup.dto';
 import { specifyMessage } from 'utils';
+import { User } from 'users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -29,13 +29,15 @@ export class AuthService {
     return this.usersService.create(signupDto);
   }
 
-  async authorizeUser(userId: TUserId) {
+  async authorizeUser(userId: User['id']) {
     const accessToken = this.jwtService.sign({ sub: userId });
     return { access_token: accessToken };
   }
 
   async validateUser(username: string, password: string) {
-    const user = await this.usersService.findOne({ where: { username } });
+    const user = await this.usersService.findOne({
+      where: { username },
+    });
 
     if (!user) {
       return null;

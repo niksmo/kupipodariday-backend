@@ -3,10 +3,9 @@ import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Wish } from 'wishes/entities/wish.entity';
 import { WishList } from 'wishlists/entities/wishlist.entity';
-import { IUser } from './types';
 
 @Entity()
-export class User extends DatabaseTable implements IUser {
+export class User extends DatabaseTable {
   @Column({ type: 'varchar', length: 30, unique: true })
   username: string;
 

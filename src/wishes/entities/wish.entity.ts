@@ -3,10 +3,9 @@ import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { User } from 'users/entities/user.entity';
 import { WishList } from 'wishlists/entities/wishlist.entity';
-import { IWish } from './types';
 
 @Entity()
-export class Wish extends DatabaseTable implements IWish {
+export class Wish extends DatabaseTable {
   @Column({ type: 'varchar', length: 250 })
   name: string;
 
@@ -26,14 +25,14 @@ export class Wish extends DatabaseTable implements IWish {
   raised: number;
 
   @Column({ type: 'int', default: 0 })
-  copied: number; // relation ? or calc from some table?
+  copied: number;
 
   @ManyToOne(() => User, (user) => user.wishes)
-  owner: User; // relation
+  owner: Optional<User, 'password'>;
 
   @OneToMany(() => Offer, (offer) => offer.item)
-  offers: Offer[]; // relation
+  offers: Offer[];
 
   @ManyToMany(() => WishList, (wishList) => wishList.items)
-  wishlists: WishList[]; // additional relation
+  wishlists: WishList[];
 }

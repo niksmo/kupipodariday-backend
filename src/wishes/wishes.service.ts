@@ -11,11 +11,10 @@ import {
   FindOptionsWhere,
   Repository,
 } from 'typeorm';
-import { IUser, TUserId } from 'users/entities/types';
+import { User } from 'users/entities/user.entity';
 import { ResultResponse, roundToHundredths, specifyMessage } from 'utils';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishByIdDto } from './dto/update-wish-by-id..dto';
-import { IWish, TWishId } from './entities/types';
 import { Wish } from './entities/wish.entity';
 
 @Injectable()
@@ -24,12 +23,12 @@ export class WishesService {
     @InjectRepository(Wish) private wishesRepository: Repository<Wish>
   ) {}
 
-  create(createWishDto: CreateWishDto, user: IUser): Promise<IWish> {
+  create(createWishDto: CreateWishDto, user: User): Promise<Wish> {
     createWishDto.price = roundToHundredths(createWishDto.price);
     return this.wishesRepository.save({ ...createWishDto, owner: user });
   }
 
-  async findOne(query: FindOneOptions<Wish>): Promise<IWish> {
+  async findOne(query: FindOneOptions<Wish>): Promise<Wish> {
     const wish = await this.wishesRepository.findOne(query);
 
     if (wish === null) {
@@ -55,9 +54,9 @@ export class WishesService {
   }
 
   async updateByOwner(
-    wishId: TWishId,
+    wishId: Wish['id'],
     updateWishByIdDto: UpdateWishByIdDto,
-    user: IUser
+    user: User
   ) {
     const storedWish = await this.findOne({
       where: {
@@ -87,7 +86,7 @@ export class WishesService {
     return this.findOne({ where: { id: wishId } });
   }
 
-  removeByOwner(wishId: TWishId, userId: TUserId) {
+  removeByOwner(wishId: Wish['id'], userId: User['id']) {
     return this.removeOne({ id: wishId, owner: { id: userId } });
   }
 }

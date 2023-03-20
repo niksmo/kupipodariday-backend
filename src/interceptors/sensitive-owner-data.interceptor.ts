@@ -5,16 +5,16 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { map } from 'rxjs';
-import { IUser } from 'users/entities/types';
+import { User } from 'users/entities/user.entity';
 
 @Injectable()
 export class SensitiveOwnerDataInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
-      map<{ owner: IUser } | { owner: IUser }[], unknown>((data) => {
+      map<{ owner: User } | { owner: User }[], unknown>((data) => {
         function excludeSensitiveData(
-          owner: IUser
-        ): Omit<IUser, 'password' | 'email'> {
+          owner: User
+        ): Omit<User, 'password' | 'email'> {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { password, email, ...interceptedOwner } = owner;
           return interceptedOwner;

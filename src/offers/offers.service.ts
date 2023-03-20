@@ -1,7 +1,11 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { IUser } from 'users/entities/types';
+import { DataSource, Repository } from 'typeorm';
+import { User } from 'users/entities/user.entity';
 import { specifyMessage } from 'utils';
 import { WishesService } from 'wishes/wishes.service';
 import { AddOfferDto } from './dto/add-offer.dto';
@@ -10,11 +14,12 @@ import { Offer } from './entities/offer.entity';
 @Injectable()
 export class OffersService {
   constructor(
+    private dataSource: DataSource,
     @InjectRepository(Offer) private offersRepository: Repository<Offer>,
     private wishesService: WishesService
   ) {}
 
-  async create(addOfferDto: AddOfferDto, user: IUser) {
+  async create(addOfferDto: AddOfferDto, user: User) {
     const wish = await this.wishesService.findOne({
       where: { id: addOfferDto.itemId },
       relations: { owner: true },
@@ -40,17 +45,31 @@ export class OffersService {
       );
     }
 
-    const newOffer = {
-      hidden: addOfferDto.hidden,
-      amount: addOfferDto.amount,
-      item: wish,
-      user,
-    };
-
     wish.raised = wish.raised + addOfferDto.amount;
 
-    this.wishesService.updateOne({ id: wish.id }, wish);
+    const offer = new Offer();
+    offer.hidden = addOfferDto.hidden;
+    offer.amount = addOfferDto.amount;
+    offer.item = wish;
+    offer.user = user;
 
-    return this.offersRepository.save(newOffer);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.manager.save(wish);
+
+      const storedOffer = await queryRunner.manager.save(offer);
+      await queryRunner.commitTransaction();
+
+      return storedOffer;
+    } catch (error) {
+      queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException(
+        specifyMessage('Возникла непредвиденная ошибка')
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

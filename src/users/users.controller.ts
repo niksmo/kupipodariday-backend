@@ -22,7 +22,7 @@ import { isEmptyBody, specifyMessage } from 'utils';
 import { WishesService } from 'wishes/wishes.service';
 import { FindUsersDto } from './dto/find-users.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
-import { IUser } from './entities/types';
+import { User as UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -42,13 +42,13 @@ export class UsersController {
 
   @Get('me')
   @UseInterceptors(ExcludeUserPasswordInterceptor)
-  getViewer(@User() user: IUser) {
+  getViewer(@User() user: UserEntity) {
     return this.usersService.findOne({ where: { id: user.id } });
   }
 
   @Get('me/wishes')
   @UseInterceptors(SensitiveOwnerDataInterceptor)
-  getViewerWishes(@User() user: IUser) {
+  getViewerWishes(@User() user: UserEntity) {
     return this.wishesService.findMany({
       where: { owner: { id: user.id } },
       relations: { owner: true, offers: true },
@@ -57,7 +57,10 @@ export class UsersController {
 
   @Patch('me')
   @UseInterceptors(ExcludeUserPasswordInterceptor)
-  updateViewer(@Body() updateViewerDto: UpdateViewerDto, @User() user: IUser) {
+  updateViewer(
+    @Body() updateViewerDto: UpdateViewerDto,
+    @User() user: UserEntity
+  ) {
     if (isEmptyBody(updateViewerDto)) {
       return user;
     }

@@ -3,12 +3,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'users/users.service';
-import { TUserId } from 'users/entities/types';
 import { TAppConfig } from 'config/app-config';
 import { specifyMessage } from 'utils';
+import { User } from 'users/entities/user.entity';
 
 interface IJwtPayload {
-  sub: TUserId;
+  sub: User['id'];
 }
 
 @Injectable()

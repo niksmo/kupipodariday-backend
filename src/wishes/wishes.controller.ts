@@ -14,7 +14,7 @@ import { User } from 'decorators/user.decorator';
 import { JwtAuthGuard } from 'guards/jwt.guard';
 import { SensitiveOwnerDataInterceptor } from 'interceptors';
 import { SensitiveOffersDataInterceptor } from 'interceptors/sensitive-offers-data.interceptor';
-import { IUser } from 'users/entities/types';
+import { User as UserEntity } from 'users/entities/user.entity';
 import { isEmptyBody, specifyMessage } from 'utils';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishByIdDto } from './dto/update-wish-by-id..dto';
@@ -27,7 +27,7 @@ export class WishesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(SensitiveOwnerDataInterceptor)
-  createWish(@Body() createWishDto: CreateWishDto, @User() user: IUser) {
+  createWish(@Body() createWishDto: CreateWishDto, @User() user: UserEntity) {
     return this.wishesService.create(createWishDto, user);
   }
 
@@ -49,7 +49,7 @@ export class WishesController {
   updateWish(
     @Param('id') id: number,
     @Body() updateWishDto: UpdateWishByIdDto,
-    @User() user: IUser
+    @User() user: UserEntity
   ) {
     if (isEmptyBody(updateWishDto)) {
       throw new BadRequestException(
@@ -61,7 +61,7 @@ export class WishesController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  deleteWish(@Param('id') id: number, @User() user: IUser) {
+  deleteWish(@Param('id') id: number, @User() user: UserEntity) {
     return this.wishesService.removeByOwner(id, user.id);
   }
 }

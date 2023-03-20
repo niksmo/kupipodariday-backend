@@ -2,10 +2,9 @@ import { DatabaseTable } from 'data-source/database-table';
 import { User } from 'users/entities/user.entity';
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { Wish } from 'wishes/entities/wish.entity';
-import { IWishlist } from './types';
 
 @Entity()
-export class WishList extends DatabaseTable implements IWishlist {
+export class WishList extends DatabaseTable {
   @Column({ type: 'varchar', length: 250 })
   name: string;
 
@@ -13,9 +12,9 @@ export class WishList extends DatabaseTable implements IWishlist {
   image: string;
 
   @ManyToOne(() => User, (user) => user.wishlists)
-  owner: User; // relation
+  owner: Optional<User, 'password'>;
 
   @ManyToMany(() => Wish)
   @JoinTable()
-  items: Wish[]; // relation
+  items: Wish[];
 }

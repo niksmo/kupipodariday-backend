@@ -4,7 +4,7 @@ import { specifyMessage } from 'utils';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  handleRequest<TUser>(err: unknown, user: undefined | TUser) {
+  handleRequest<User>(err: unknown, user: undefined | User) {
     if (err || !user) {
       throw (
         err ||
