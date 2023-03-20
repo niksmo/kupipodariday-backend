@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -17,7 +16,6 @@ import {
   SensitiveOffersDataInterceptor,
 } from 'interceptors';
 import { User as UserEntity } from 'users/entities/user.entity';
-import { isEmptyBody, specifyMessage } from 'utils';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishByIdDto } from './dto/update-wish-by-id..dto';
 import { WishesService } from './wishes.service';
@@ -25,6 +23,28 @@ import { WishesService } from './wishes.service';
 @Controller('wishes')
 export class WishesController {
   constructor(private readonly wishesService: WishesService) {}
+
+  @Get('last')
+  @UseInterceptors(SensitiveOwnerDataInterceptor)
+  findLast() {
+    return this.wishesService.findLast();
+  }
+
+  @Get('top')
+  @UseInterceptors(SensitiveOwnerDataInterceptor)
+  findTop() {
+    return this.wishesService.findTop();
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    SensitiveOwnerDataInterceptor,
+    SensitiveOffersDataInterceptor
+  )
+  findById(@Param('id') id: number) {
+    return this.wishesService.findOneById(id);
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -40,35 +60,17 @@ export class WishesController {
     return this.wishesService.copy(id, user);
   }
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    SensitiveOwnerDataInterceptor,
-    SensitiveOffersDataInterceptor
-  )
-  findWish(@Param('id') id: number) {
-    return this.wishesService.findOne({
-      where: { id },
-      relations: { owner: true, offers: { user: true } },
-    });
-  }
-
-  @Patch(':id')
+  @Patch(':id') // not exist on frontend
   @UseGuards(JwtAuthGuard)
   updateWish(
     @Param('id') id: number,
     @Body() updateWishDto: UpdateWishByIdDto,
     @User() user: UserEntity
   ) {
-    if (isEmptyBody(updateWishDto)) {
-      throw new BadRequestException(
-        specifyMessage('Не указано ни одно параметра')
-      );
-    }
     return this.wishesService.updateByOwner(id, updateWishDto, user);
   }
 
-  @Delete(':id')
+  @Delete(':id') // not exist on frontend
   @UseGuards(JwtAuthGuard)
   deleteWish(@Param('id') id: number, @User() user: UserEntity) {
     return this.wishesService.removeByOwner(id, user.id);

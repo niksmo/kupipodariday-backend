@@ -14,10 +14,16 @@ import {
   Repository,
 } from 'typeorm';
 import { User } from 'users/entities/user.entity';
-import { ResultResponse, roundToHundredths, specifyMessage } from 'utils';
+import {
+  isEmptyBody,
+  ResultResponse,
+  roundToHundredths,
+  specifyMessage,
+} from 'utils';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishByIdDto } from './dto/update-wish-by-id..dto';
 import { Wish } from './entities/wish.entity';
+import { FIND_LAST_LIMIT, FIND_TOP_LIMIT } from './lib';
 
 @Injectable()
 export class WishesService {
@@ -54,6 +60,29 @@ export class WishesService {
       throw new NotFoundException(specifyMessage('Подарок не найден'));
     }
     return new ResultResponse(true, 'Подарок удален');
+  }
+
+  findOneById(id: Wish['id']) {
+    return this.findOne({
+      where: { id },
+      relations: { owner: true, offers: { user: true } },
+    });
+  }
+
+  findLast() {
+    return this.findMany({
+      order: { createdAt: 'DESC' },
+      take: FIND_LAST_LIMIT,
+      relations: { owner: true },
+    });
+  }
+
+  findTop() {
+    return this.findMany({
+      order: { copied: 'DESC' },
+      take: FIND_TOP_LIMIT,
+      relations: { owner: true },
+    });
   }
 
   async copy(id: Wish['id'], user: User) {
@@ -110,9 +139,15 @@ export class WishesService {
 
   async updateByOwner(
     wishId: Wish['id'],
-    updateWishByIdDto: UpdateWishByIdDto,
+    updateWishDto: UpdateWishByIdDto,
     user: User
   ) {
+    if (isEmptyBody(updateWishDto)) {
+      throw new BadRequestException(
+        specifyMessage('Не указано ни одно параметра')
+      );
+    }
+
     const storedWish = await this.findOne({
       where: {
         id: wishId,
@@ -120,7 +155,7 @@ export class WishesService {
       },
     });
 
-    if (updateWishByIdDto.price && storedWish.raised !== 0) {
+    if (updateWishDto.price && storedWish.raised !== 0) {
       throw new BadRequestException(
         specifyMessage(
           'Нельзя менять стоимость подарка, т.к. уже есть желающие скинуться на него'
@@ -128,10 +163,7 @@ export class WishesService {
       );
     }
 
-    const updateResult = await this.updateOne(
-      { id: wishId },
-      updateWishByIdDto
-    );
+    const updateResult = await this.updateOne({ id: wishId }, updateWishDto);
 
     if (updateResult.affected === 0) {
       throw new InternalServerErrorException(
