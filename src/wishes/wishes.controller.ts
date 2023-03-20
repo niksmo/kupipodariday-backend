@@ -12,8 +12,10 @@ import {
 } from '@nestjs/common';
 import { User } from 'decorators/user.decorator';
 import { JwtAuthGuard } from 'guards/jwt.guard';
-import { SensitiveOwnerDataInterceptor } from 'interceptors';
-import { SensitiveOffersDataInterceptor } from 'interceptors/sensitive-offers-data.interceptor';
+import {
+  SensitiveOwnerDataInterceptor,
+  SensitiveOffersDataInterceptor,
+} from 'interceptors';
 import { User as UserEntity } from 'users/entities/user.entity';
 import { isEmptyBody, specifyMessage } from 'utils';
 import { CreateWishDto } from './dto/create-wish.dto';
