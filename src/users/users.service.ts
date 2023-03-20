@@ -2,12 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TAppConfig } from 'config/app-config';
-import {
-  FindManyOptions,
-  FindOneOptions,
-  FindOptionsWhere,
-  Repository,
-} from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, Like, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
 import { User } from './entities/user.entity';
@@ -31,8 +26,14 @@ export class UsersService {
     return this.usersRepository.findOne(query);
   }
 
-  findMany(query: FindManyOptions<User>) {
-    return this.usersRepository.find(query);
+  findMany(query: string) {
+    const normalizedQuery = query.toLowerCase();
+    return this.usersRepository.find({
+      where: [
+        { username: Like(`%${normalizedQuery}%`) },
+        { email: normalizedQuery },
+      ],
+    });
   }
 
   updateOne(query: FindOptionsWhere<User>, updateViewerDto: UpdateViewerDto) {

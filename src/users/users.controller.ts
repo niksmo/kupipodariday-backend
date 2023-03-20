@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   NotFoundException,
   Param,
   Patch,
@@ -19,6 +21,7 @@ import {
 import { isEmptyBody, specifyMessage } from 'utils';
 import { WishesService } from 'wishes/wishes.service';
 import { FindUserByNameDto } from './dto/find-user-by-name.dto';
+import { FindUsersDto } from './dto/find-users.dto';
 import { UpdateViewerDto } from './dto/update-viewer.dto';
 import { IUser } from './entities/types';
 import { UsersService } from './users.service';
@@ -31,9 +34,11 @@ export class UsersController {
     private readonly wishesService: WishesService
   ) {}
 
-  @Post('find') //вернуться к этому роуту, т.к. тут явно нужен POST как в свагере
-  async findUsers() {
-    return null;
+  @Post('find')
+  @HttpCode(HttpStatus.OK)
+  async findUsersByNameOrEmail(@Body() findUsersDto: FindUsersDto) {
+    const { query } = findUsersDto;
+    return this.usersService.findMany(query);
   }
 
   @Get('me')
