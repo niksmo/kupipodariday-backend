@@ -3,9 +3,11 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  DataSource,
   FindManyOptions,
   FindOneOptions,
   FindOptionsWhere,
@@ -20,6 +22,7 @@ import { Wish } from './entities/wish.entity';
 @Injectable()
 export class WishesService {
   constructor(
+    private dataSource: DataSource,
     @InjectRepository(Wish) private wishesRepository: Repository<Wish>
   ) {}
 
@@ -51,6 +54,58 @@ export class WishesService {
       throw new NotFoundException(specifyMessage('Подарок не найден'));
     }
     return new ResultResponse(true, 'Подарок удален');
+  }
+
+  async copy(id: Wish['id'], user: User) {
+    const storedWish = await this.findOne({
+      where: { id },
+      relations: { owner: true },
+    });
+
+    const isExistUsersWish = user.wishes.some(
+      (wish) => wish.image === storedWish.image && wish.link === storedWish.link
+    );
+
+    if (isExistUsersWish || storedWish.owner.id === user.id) {
+      throw new UnprocessableEntityException(
+        specifyMessage('Вы не можете добавлять в вишлист свои подарки')
+      );
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      storedWish.copied += 1;
+
+      const { copied, description, image, link, name, price, wishlists } =
+        storedWish;
+
+      const candidateWish = queryRunner.manager.create(Wish, {
+        owner: user,
+        copied,
+        description,
+        image,
+        link,
+        name,
+        price,
+        wishlists,
+      });
+
+      await queryRunner.manager.save(storedWish);
+      const savedWish = await queryRunner.manager.save(candidateWish);
+      await queryRunner.commitTransaction();
+
+      return savedWish;
+    } catch {
+      await queryRunner.rollbackTransaction();
+
+      throw new InternalServerErrorException(
+        specifyMessage('Возникла непредвиденная ошибка')
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async updateByOwner(

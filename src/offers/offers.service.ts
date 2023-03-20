@@ -25,9 +25,9 @@ export class OffersService {
       relations: { owner: true },
     });
 
-    if (wish.owner?.id === user.id) {
+    if (wish.owner.id === user.id) {
       throw new UnprocessableEntityException(
-        specifyMessage('Нельзя скидываться на свои подарки')
+        specifyMessage('Вы не можете скидываться на свои подарки')
       );
     }
 

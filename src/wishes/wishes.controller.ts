@@ -33,6 +33,13 @@ export class WishesController {
     return this.wishesService.create(createWishDto, user);
   }
 
+  @Post(':id/copy')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(SensitiveOwnerDataInterceptor)
+  copyWish(@Param('id') id: number, @User() user: UserEntity) {
+    return this.wishesService.copy(id, user);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
