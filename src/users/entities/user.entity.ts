@@ -2,7 +2,7 @@ import { DatabaseTable } from 'data-source/database-table';
 import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Wish } from 'wishes/entities/wish.entity';
-import { WishList } from 'wishlists/entities/wishlist.entity';
+import { Wishlist } from 'wishlists/entities/wishlist.entity';
 
 @Entity()
 export class User extends DatabaseTable {
@@ -26,11 +26,11 @@ export class User extends DatabaseTable {
   password: string;
 
   @OneToMany(() => Wish, (wish) => wish.owner)
-  wishes: Wish[]; // relation
+  wishes: Wish[];
 
   @OneToMany(() => Offer, (offer) => offer.user)
-  offers: Offer[]; // relation
+  offers: Offer[];
 
-  @OneToMany(() => WishList, (wishList) => wishList.owner)
-  wishlists: WishList[]; // relation
+  @OneToMany(() => Wishlist, (wishlist) => wishlist.owner)
+  wishlists: Wishlist[];
 }

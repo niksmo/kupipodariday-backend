@@ -4,7 +4,7 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { Wish } from 'wishes/entities/wish.entity';
 
 @Entity()
-export class WishList extends DatabaseTable {
+export class Wishlist extends DatabaseTable {
   @Column({ type: 'varchar', length: 250 })
   name: string;
 

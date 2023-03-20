@@ -2,7 +2,7 @@ import { DatabaseTable } from 'data-source/database-table';
 import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { User } from 'users/entities/user.entity';
-import { WishList } from 'wishlists/entities/wishlist.entity';
+import { Wishlist } from 'wishlists/entities/wishlist.entity';
 
 @Entity()
 export class Wish extends DatabaseTable {
@@ -33,6 +33,6 @@ export class Wish extends DatabaseTable {
   @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
 
-  @ManyToMany(() => WishList, (wishList) => wishList.items)
-  wishlists: WishList[];
+  @ManyToMany(() => Wishlist, (wishlist) => wishlist.items)
+  wishlists: Wishlist[];
 }

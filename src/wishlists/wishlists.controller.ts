@@ -1,7 +1,14 @@
-import { Controller } from '@nestjs/common';
-import { WishListsService } from './wishlists.service';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'guards/jwt.guard';
+import { WishlistsService } from './wishlists.service';
 
-@Controller('wishlists')
-export class WishListsController {
-  constructor(private readonly wishListsService: WishListsService) {}
+@Controller('wishlistlists')
+export class WishlistsController {
+  constructor(private readonly wishListsService: WishlistsService) {}
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  findAll() {
+    return this.wishListsService.findAll();
+  }
 }
