@@ -47,17 +47,18 @@ export class OffersService {
 
     wish.raised = wish.raised + addOfferDto.amount;
 
-    const offer = new Offer();
-    offer.hidden = addOfferDto.hidden;
-    offer.amount = addOfferDto.amount;
-    offer.item = wish;
-    offer.user = user;
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
       await queryRunner.manager.save(wish);
+
+      const offer = queryRunner.manager.create(Offer, {
+        hidden: addOfferDto.hidden,
+        amount: addOfferDto.amount,
+        item: wish,
+        user,
+      });
 
       const storedOffer = await queryRunner.manager.save(offer);
       await queryRunner.commitTransaction();
