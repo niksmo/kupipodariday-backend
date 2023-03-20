@@ -13,6 +13,7 @@ import {
 import { User } from 'decorators/user.decorator';
 import { JwtAuthGuard } from 'guards/jwt.guard';
 import { SensitiveOwnerDataInterceptor } from 'interceptors';
+import { SensitiveOffersDataInterceptor } from 'interceptors/sensitive-offers-data.interceptor';
 import { IUser } from 'users/entities/types';
 import { isEmptyBody, specifyMessage } from 'utils';
 import { CreateWishDto } from './dto/create-wish.dto';
@@ -32,11 +33,14 @@ export class WishesController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(SensitiveOwnerDataInterceptor)
+  @UseInterceptors(
+    SensitiveOwnerDataInterceptor,
+    SensitiveOffersDataInterceptor
+  )
   findWish(@Param('id') id: number) {
     return this.wishesService.findOne({
       where: { id },
-      relations: { owner: true, offers: true },
+      relations: { owner: true, offers: { user: true } },
     });
   }
 

@@ -8,7 +8,7 @@ export interface IUser extends TDatabaseTable {
   about: string;
   avatar: string;
   email: string;
-  password: string;
+  password?: string;
   wishes: IWish[];
   offers: IOffer[];
   wishlists: IWishlist[];
