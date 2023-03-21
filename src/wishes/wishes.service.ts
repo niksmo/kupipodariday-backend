@@ -91,11 +91,15 @@ export class WishesService {
       relations: { owner: true },
     });
 
-    const isExistUsersWish = user.wishes.some(
+    const userWishes = await this.findMany({
+      where: { owner: { id: user.id } },
+    });
+
+    const alreadyInUserWishes = userWishes.some(
       (wish) => wish.image === storedWish.image && wish.link === storedWish.link
     );
 
-    if (isExistUsersWish || storedWish.owner.id === user.id) {
+    if (alreadyInUserWishes || storedWish.owner.id === user.id) {
       throw new UnprocessableEntityException(
         specifyMessage('Вы не можете добавлять в вишлист свои подарки')
       );
