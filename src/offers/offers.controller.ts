@@ -1,8 +1,8 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { User } from 'decorators/user.decorator';
-import { JwtAuthGuard } from 'guards/jwt.guard';
+import { User } from 'decorators';
+import { JwtAuthGuard } from 'guards';
 import { User as UserEntity } from 'users/entities/user.entity';
-import { AddOfferDto } from './dto/add-offer.dto';
+import { CreateOfferDto } from './dto';
 import { OffersService } from './offers.service';
 
 @Controller('offers')
@@ -11,7 +11,7 @@ export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 
   @Post()
-  addOffer(@Body() addOfferDto: AddOfferDto, @User() user: UserEntity) {
-    return this.offersService.create(addOfferDto, user);
+  createOne(@Body() createOfferDto: CreateOfferDto, @User() user: UserEntity) {
+    return this.offersService.create(createOfferDto, user);
   }
 }

@@ -2,7 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compareWithHash } from 'users/lib';
 import { UsersService } from 'users/users.service';
-import { SignupDto } from './dto/signup.dto';
+import { SignupDto } from './dto';
 import { specifyMessage } from 'utils';
 import { User } from 'users/entities/user.entity';
 

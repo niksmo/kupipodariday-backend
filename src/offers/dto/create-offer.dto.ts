@@ -1,6 +1,6 @@
 import { IsBoolean, IsNumber } from 'class-validator';
 
-export class AddOfferDto {
+export class CreateOfferDto {
   @IsNumber()
   itemId: number;
 

@@ -1,6 +1,6 @@
-import { DatabaseTable } from 'data-source/database-table';
-import { Offer } from 'offers/entities/offer.entity';
 import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
+import { DatabaseTable } from 'data-source';
+import { Offer } from 'offers/entities/offer.entity';
 import { User } from 'users/entities/user.entity';
 import { Wishlist } from 'wishlists/entities/wishlist.entity';
 

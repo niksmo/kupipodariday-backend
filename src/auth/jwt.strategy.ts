@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'users/users.service';
-import { TAppConfig } from 'config/app-config';
+import { TAppConfig } from 'config';
 import { specifyMessage } from 'utils';
 import { User } from 'users/entities/user.entity';
 

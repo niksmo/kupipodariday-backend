@@ -1,7 +1,7 @@
 import { IsNumber, IsOptional, IsUrl, Length } from 'class-validator';
 import { specifyMessage } from 'utils';
 
-export class UpdateWishByIdDto {
+export class UpdateWishDto {
   @Length(
     1,
     250,

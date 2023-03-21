@@ -1,6 +1,6 @@
-import { DatabaseTable } from 'data-source/database-table';
-import { User } from 'users/entities/user.entity';
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { DatabaseTable } from 'data-source';
+import { User } from 'users/entities/user.entity';
 import { Wish } from 'wishes/entities/wish.entity';
 
 @Entity()

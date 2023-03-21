@@ -6,10 +6,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from 'guards/local.guard';
-import { SignupDto } from './dto/signup.dto';
+import { LocalAuthGuard } from 'guards';
+import { SignupDto } from './dto';
 import { ExcludeUserPasswordInterceptor } from 'interceptors';
-import { User } from 'decorators/user.decorator';
+import { User } from 'decorators';
 import { User as UserEntity } from 'users/entities/user.entity';
 
 @Controller()

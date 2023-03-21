@@ -10,8 +10,7 @@ import { User } from 'users/entities/user.entity';
 import { isEmptyBody, specifyMessage } from 'utils';
 import { Wish } from 'wishes/entities/wish.entity';
 import { WishesService } from 'wishes/wishes.service';
-import { CreateWishlistDto } from './dto/create-wishlist.dto';
-import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { CreateWishlistDto, UpdateWishlistDto } from './dto';
 import { Wishlist } from './entities/wishlist.entity';
 
 @Injectable()

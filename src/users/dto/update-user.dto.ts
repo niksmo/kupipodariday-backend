@@ -2,13 +2,14 @@ import { IsOptional, IsUrl, Length, Matches } from 'class-validator';
 import { EMAIL_PATTERN, USERNAME_PATTERN, PASSWORD_PATTERN } from 'users/lib';
 import { specifyMessage } from 'utils';
 
-export class CreateUserDto {
+export class UpdateUserDto {
   @Matches(
     USERNAME_PATTERN,
     specifyMessage(
       'Имя пользователя должно быть строчными латинскими буквами от 2 до 30 символов'
     )
   )
+  @IsOptional()
   readonly username: string;
 
   @Length(
@@ -24,11 +25,13 @@ export class CreateUserDto {
   readonly avatar: string;
 
   @Matches(EMAIL_PATTERN, specifyMessage('Email указан неверно'))
+  @IsOptional()
   readonly email: string;
 
   @Matches(
     PASSWORD_PATTERN,
     specifyMessage('Пароль должен содержать латинские и специальные символы')
   )
+  @IsOptional()
   password: string;
 }

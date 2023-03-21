@@ -3,8 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TAppConfig } from 'config/app-config';
 import { FindOneOptions, FindOptionsWhere, Like, Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateViewerDto } from './dto/update-viewer.dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './entities/user.entity';
 import { hashPassword } from './lib';
 import { specifyMessage } from 'utils';
@@ -35,20 +34,17 @@ export class UsersService {
     });
   }
 
-  updateOne(query: FindOptionsWhere<User>, updateViewerDto: UpdateViewerDto) {
-    return this.usersRepository.update(query, updateViewerDto);
+  updateOne(query: FindOptionsWhere<User>, updateUserDto: UpdateUserDto) {
+    return this.usersRepository.update(query, updateUserDto);
   }
 
   async updateByOwner(
-    updateViewerDto: UpdateViewerDto,
+    updateUserDto: UpdateUserDto,
     user: User
   ): Promise<User | null> {
-    if (
-      updateViewerDto.username &&
-      updateViewerDto.username !== user.username
-    ) {
+    if (updateUserDto.username && updateUserDto.username !== user.username) {
       const isExistUsername = await this.findOne({
-        where: { username: updateViewerDto.username },
+        where: { username: updateUserDto.username },
       });
 
       if (isExistUsername) {
@@ -58,9 +54,9 @@ export class UsersService {
       }
     }
 
-    if (updateViewerDto.email && updateViewerDto.email !== user.email) {
+    if (updateUserDto.email && updateUserDto.email !== user.email) {
       const isExistEmail = await this.findOne({
-        where: { email: updateViewerDto.email },
+        where: { email: updateUserDto.email },
       });
 
       if (isExistEmail) {
@@ -70,8 +66,8 @@ export class UsersService {
       }
     }
 
-    await hashPassword(updateViewerDto, this.configService.get('hashRounds'));
-    await this.updateOne({ id: user.id }, updateViewerDto);
+    await hashPassword(updateUserDto, this.configService.get('hashRounds'));
+    await this.updateOne({ id: user.id }, updateUserDto);
     return this.findOne({ where: { id: user.id } });
   }
 }

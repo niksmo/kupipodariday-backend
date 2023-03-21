@@ -11,8 +11,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { User } from 'decorators/user.decorator';
-import { JwtAuthGuard } from 'guards/jwt.guard';
+import { User } from 'decorators';
+import { JwtAuthGuard } from 'guards';
 import {
   ExcludeUserEmailInterceptor,
   ExcludeUserPasswordInterceptor,
@@ -20,8 +20,7 @@ import {
 } from 'interceptors';
 import { isEmptyBody, specifyMessage } from 'utils';
 import { WishesService } from 'wishes/wishes.service';
-import { FindUsersDto } from './dto/find-users.dto';
-import { UpdateViewerDto } from './dto/update-viewer.dto';
+import { FindUsersDto, UpdateUserDto } from './dto';
 import { User as UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -42,13 +41,13 @@ export class UsersController {
 
   @Get('me')
   @UseInterceptors(ExcludeUserPasswordInterceptor)
-  getViewer(@User() user: UserEntity) {
+  getUser(@User() user: UserEntity) {
     return this.usersService.findOne({ where: { id: user.id } });
   }
 
   @Get('me/wishes')
   @UseInterceptors(SensitiveOwnerDataInterceptor)
-  getViewerWishes(@User() user: UserEntity) {
+  getUserWishes(@User() user: UserEntity) {
     return this.wishesService.findMany({
       where: { owner: { id: user.id } },
       relations: { owner: true, offers: true },
@@ -57,14 +56,11 @@ export class UsersController {
 
   @Patch('me')
   @UseInterceptors(ExcludeUserPasswordInterceptor)
-  updateViewer(
-    @Body() updateViewerDto: UpdateViewerDto,
-    @User() user: UserEntity
-  ) {
-    if (isEmptyBody(updateViewerDto)) {
+  updateUser(@Body() updateUserDto: UpdateUserDto, @User() user: UserEntity) {
+    if (isEmptyBody(updateUserDto)) {
       return user;
     }
-    return this.usersService.updateByOwner(updateViewerDto, user);
+    return this.usersService.updateByOwner(updateUserDto, user);
   }
 
   @Get(':username')

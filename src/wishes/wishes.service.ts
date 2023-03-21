@@ -20,8 +20,7 @@ import {
   roundToHundredths,
   specifyMessage,
 } from 'utils';
-import { CreateWishDto } from './dto/create-wish.dto';
-import { UpdateWishByIdDto } from './dto/update-wish-by-id..dto';
+import { CreateWishDto, UpdateWishDto } from './dto';
 import { Wish } from './entities/wish.entity';
 import { FIND_LAST_LIMIT, FIND_TOP_LIMIT } from './lib';
 
@@ -50,7 +49,7 @@ export class WishesService {
     return this.wishesRepository.find(query);
   }
 
-  updateOne(query: FindOptionsWhere<Wish>, updateWishDto: UpdateWishByIdDto) {
+  updateOne(query: FindOptionsWhere<Wish>, updateWishDto: UpdateWishDto) {
     return this.wishesRepository.update(query, updateWishDto);
   }
 
@@ -143,7 +142,7 @@ export class WishesService {
 
   async updateByOwner(
     wishId: Wish['id'],
-    updateWishDto: UpdateWishByIdDto,
+    updateWishDto: UpdateWishDto,
     user: User
   ) {
     if (isEmptyBody(updateWishDto)) {

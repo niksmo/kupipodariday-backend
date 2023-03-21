@@ -9,15 +9,14 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { User } from 'decorators/user.decorator';
-import { JwtAuthGuard } from 'guards/jwt.guard';
+import { User } from 'decorators';
+import { JwtAuthGuard } from 'guards';
 import {
   SensitiveOwnerDataInterceptor,
   SensitiveOffersDataInterceptor,
 } from 'interceptors';
 import { User as UserEntity } from 'users/entities/user.entity';
-import { CreateWishDto } from './dto/create-wish.dto';
-import { UpdateWishByIdDto } from './dto/update-wish-by-id..dto';
+import { CreateWishDto, UpdateWishDto } from './dto';
 import { WishesService } from './wishes.service';
 
 @Controller('wishes')
@@ -64,7 +63,7 @@ export class WishesController {
   @UseGuards(JwtAuthGuard)
   updateWish(
     @Param('id') id: number,
-    @Body() updateWishDto: UpdateWishByIdDto,
+    @Body() updateWishDto: UpdateWishDto,
     @User() user: UserEntity
   ) {
     return this.wishesService.updateByOwner(id, updateWishDto, user);
