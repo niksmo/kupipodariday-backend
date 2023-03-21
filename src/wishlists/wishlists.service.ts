@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -21,7 +20,7 @@ export class WishlistsService {
     private wishesService: WishesService
   ) {}
 
-  async createOne(createWishlistDto: CreateWishlistDto, user: User) {
+  async create(createWishlistDto: CreateWishlistDto, user: User) {
     const storedItems = await this.wishesService.findMany({
       where: { id: In(createWishlistDto.itemsId), owner: { id: user.id } },
     });
@@ -40,21 +39,39 @@ export class WishlistsService {
     return this.wishlistsRepository.save(wishlist);
   }
 
-  async findAll() {
+  async findOne(
+    ...query: Parameters<typeof this.wishlistsRepository.findOne>
+  ): Promise<Wishlist> {
+    const wishlist = await this.wishlistsRepository.findOne(...query);
+
+    if (wishlist === null) {
+      throw new NotFoundException(specifyMessage('Коллекция не найдена'));
+    }
+
+    return wishlist;
+  }
+
+  async updateOne(...query: Parameters<typeof this.wishlistsRepository.save>) {
+    return this.wishlistsRepository.save(...query);
+  }
+
+  async removeOne(
+    ...query: Parameters<typeof this.wishlistsRepository.remove>
+  ) {
+    return this.wishlistsRepository.remove(...query);
+  }
+
+  async findAll(): Promise<Wishlist[]> {
     return this.wishlistsRepository.find({
       relations: { owner: true, items: true },
     });
   }
 
   async findOneById(wishlistId: Wishlist['id']) {
-    const wishlist = await this.wishlistsRepository.findOne({
+    const wishlist = await this.findOne({
       where: { id: wishlistId },
       relations: { owner: true, items: true },
     });
-
-    if (wishlist === null) {
-      throw new NotFoundException(specifyMessage('Коллекция не найдена'));
-    }
 
     return wishlist;
   }
@@ -70,26 +87,21 @@ export class WishlistsService {
       );
     }
 
-    const storedWishlist = await this.findOneById(wishlistId);
-
-    const isOwner = storedWishlist.owner.id === user.id;
+    const storedWishlist = await this.findOne({
+      where: { id: wishlistId, owner: { id: user.id } },
+      relations: { owner: true, items: true },
+    });
 
     let storedItems: Wish[] | undefined;
-
-    if (!isOwner) {
-      throw new ForbiddenException(
-        'Вы не можете редактировать чужие коллекции'
-      );
-    }
 
     const { itemsId, ...restUpdateWishlistDto } = updateWishlistDto;
 
     if (itemsId) {
       storedItems = await this.wishesService.findMany({
-        where: { id: In(updateWishlistDto.itemsId), owner: { id: user.id } },
+        where: { id: In(itemsId), owner: { id: user.id } },
       });
 
-      if (storedItems.length !== updateWishlistDto.itemsId.length) {
+      if (storedItems.length !== itemsId.length) {
         throw new BadRequestException(
           specifyMessage('Вы можете добавлять только существующие подарки')
         );
@@ -102,20 +114,15 @@ export class WishlistsService {
       updatedWishlist.items = storedItems;
     }
 
-    return this.wishlistsRepository.save(updatedWishlist);
+    return this.updateOne(updatedWishlist);
   }
 
-  async deleteOneById(wishlistId: Wishlist['id'], user: User) {
-    const wishlist = await this.findOneById(wishlistId);
+  async removeOneById(wishlistId: Wishlist['id'], user: User) {
+    const wishlist = await this.findOne({
+      where: { id: wishlistId, owner: { id: user.id } },
+      relations: { owner: true, items: true },
+    });
 
-    const isOwner = wishlist.owner.id === user.id;
-
-    if (!isOwner) {
-      throw new ForbiddenException('Вы не можете удалять чужие коллекции');
-    }
-
-    this.wishlistsRepository.delete({ id: wishlistId });
-
-    return wishlist;
+    return this.removeOne(wishlist);
   }
 }

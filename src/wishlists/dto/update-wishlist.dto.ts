@@ -8,13 +8,13 @@ export class UpdateWishlistDto {
     250,
     specifyMessage('Название коллекции должно быть от 1 до 250 символов')
   )
-  name: string;
+  name?: string;
 
   @IsOptional()
   @IsUrl(undefined, specifyMessage('Неверная ссылка на картинку'))
-  image: string;
+  image?: string;
 
   @IsOptional()
   @ArrayNotEmpty(specifyMessage('Список подарков не может быть пустым'))
-  itemsId: number[];
+  itemsId?: number[];
 }

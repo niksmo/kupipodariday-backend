@@ -38,7 +38,7 @@ export class WishlistsController {
     @Body() createWishlistDto: CreateWishlistDto,
     @User() user: UserEntity
   ) {
-    return this.wishlistsService.createOne(createWishlistDto, user);
+    return this.wishlistsService.create(createWishlistDto, user);
   }
 
   @Patch(':id')
@@ -53,6 +53,6 @@ export class WishlistsController {
 
   @Delete(':id')
   deleteOneById(@Param('id') id: Wishlist['id'], @User() user: UserEntity) {
-    return this.wishlistsService.deleteOneById(id, user);
+    return this.wishlistsService.removeOneById(id, user);
   }
 }
