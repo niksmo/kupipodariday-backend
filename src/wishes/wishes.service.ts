@@ -6,20 +6,9 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  DataSource,
-  FindManyOptions,
-  FindOneOptions,
-  FindOptionsWhere,
-  Repository,
-} from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from 'users/entities/user.entity';
-import {
-  isEmptyBody,
-  ResultResponse,
-  roundToHundredths,
-  specifyMessage,
-} from 'utils';
+import { isEmptyBody, roundToHundredths, specifyMessage } from 'utils';
 import { CreateWishDto, UpdateWishDto } from './dto';
 import { Wish } from './entities/wish.entity';
 import { FIND_LAST_LIMIT, FIND_TOP_LIMIT } from './lib';
@@ -31,13 +20,15 @@ export class WishesService {
     @InjectRepository(Wish) private wishesRepository: Repository<Wish>
   ) {}
 
-  create(createWishDto: CreateWishDto, user: User): Promise<Wish> {
+  async create(createWishDto: CreateWishDto, user: User): Promise<Wish> {
     createWishDto.price = roundToHundredths(createWishDto.price);
     return this.wishesRepository.save({ ...createWishDto, owner: user });
   }
 
-  async findOne(query: FindOneOptions<Wish>): Promise<Wish> {
-    const wish = await this.wishesRepository.findOne(query);
+  async findOne(
+    ...query: Parameters<typeof this.wishesRepository.findOne>
+  ): Promise<Wish> {
+    const wish = await this.wishesRepository.findOne(...query);
 
     if (wish === null) {
       throw new NotFoundException(specifyMessage('Подарок не найден'));
@@ -45,30 +36,26 @@ export class WishesService {
     return wish;
   }
 
-  findMany(query: FindManyOptions<Wish>) {
-    return this.wishesRepository.find(query);
+  async findMany(...query: Parameters<typeof this.wishesRepository.find>) {
+    return this.wishesRepository.find(...query);
   }
 
-  updateOne(query: FindOptionsWhere<Wish>, updateWishDto: UpdateWishDto) {
-    return this.wishesRepository.update(query, updateWishDto);
+  async updateOne(...query: Parameters<typeof this.wishesRepository.save>) {
+    return this.wishesRepository.save(...query);
   }
 
-  async removeOne(query: FindOptionsWhere<Wish>) {
-    const result = await this.wishesRepository.delete(query);
-    if (result.affected === 0) {
-      throw new NotFoundException(specifyMessage('Подарок не найден'));
-    }
-    return new ResultResponse(true, 'Подарок удален');
+  async removeOne(...query: Parameters<typeof this.wishesRepository.remove>) {
+    return this.wishesRepository.remove(...query);
   }
 
-  findOneById(id: Wish['id']) {
+  async findOneById(id: Wish['id']) {
     return this.findOne({
       where: { id },
       relations: { owner: true, offers: { user: true } },
     });
   }
 
-  findLast() {
+  async findLast() {
     return this.findMany({
       order: { createdAt: 'DESC' },
       take: FIND_LAST_LIMIT,
@@ -76,7 +63,7 @@ export class WishesService {
     });
   }
 
-  findTop() {
+  async findTop() {
     return this.findMany({
       order: { copied: 'DESC' },
       take: FIND_TOP_LIMIT,
@@ -84,7 +71,7 @@ export class WishesService {
     });
   }
 
-  async copy(id: Wish['id'], user: User) {
+  async copyById(id: Wish['id'], user: User) {
     const storedWish = await this.findOne({
       where: { id },
       relations: { owner: true },
@@ -92,6 +79,7 @@ export class WishesService {
 
     const userWishes = await this.findMany({
       where: { owner: { id: user.id } },
+      relations: { owner: true },
     });
 
     const alreadyInUserWishes = userWishes.some(
@@ -100,7 +88,7 @@ export class WishesService {
 
     if (alreadyInUserWishes || storedWish.owner.id === user.id) {
       throw new UnprocessableEntityException(
-        specifyMessage('Вы не можете добавлять в вишлист свои подарки')
+        specifyMessage('Подарок уже есть в вашем вишлисте')
       );
     }
 
@@ -140,7 +128,7 @@ export class WishesService {
     }
   }
 
-  async updateByOwner(
+  async updateById(
     wishId: Wish['id'],
     updateWishDto: UpdateWishDto,
     user: User
@@ -156,6 +144,7 @@ export class WishesService {
         id: wishId,
         owner: { id: user.id },
       },
+      relations: { owner: true, offers: true },
     });
 
     if (updateWishDto.price && storedWish.raised !== 0) {
@@ -166,17 +155,20 @@ export class WishesService {
       );
     }
 
-    const updateResult = await this.updateOne({ id: wishId }, updateWishDto);
+    const updatedWish = { ...storedWish, ...updateWishDto };
 
-    if (updateResult.affected === 0) {
-      throw new InternalServerErrorException(
-        specifyMessage('Не удалось обновить запись')
-      );
+    if (updatedWish.price) {
+      updatedWish.price = roundToHundredths(updatedWish.price);
     }
-    return this.findOne({ where: { id: wishId } });
+
+    return this.updateOne(updatedWish);
   }
 
-  removeByOwner(wishId: Wish['id'], userId: User['id']) {
-    return this.removeOne({ id: wishId, owner: { id: userId } });
+  async removeById(wishId: Wish['id'], userId: User['id']) {
+    const storedWish = await this.findOne({
+      where: { id: wishId, owner: { id: userId } },
+      relations: { owner: true, offers: true },
+    });
+    return this.removeOne(storedWish);
   }
 }

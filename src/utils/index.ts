@@ -8,10 +8,3 @@ export function roundToHundredths(value: number) {
 export function isEmptyBody<T extends object>(body: T) {
   return Object.keys(body).length === 0;
 }
-
-export class ResultResponse {
-  constructor(
-    public readonly success: boolean,
-    public readonly message: string
-  ) {}
-}

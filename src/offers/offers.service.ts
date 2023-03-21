@@ -28,7 +28,7 @@ export class OffersService {
 
     if (wish.owner.id === user.id) {
       throw new UnprocessableEntityException(
-        specifyMessage('Вы не можете скидываться на свои подарки')
+        specifyMessage('Вы не можете поддерживать подарки из своего вишлиста')
       );
     }
 

@@ -48,30 +48,38 @@ export class WishesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(SensitiveOwnerDataInterceptor)
-  createWish(@Body() createWishDto: CreateWishDto, @User() user: UserEntity) {
+  create(@Body() createWishDto: CreateWishDto, @User() user: UserEntity) {
     return this.wishesService.create(createWishDto, user);
   }
 
   @Post(':id/copy')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(SensitiveOwnerDataInterceptor)
-  copyWish(@Param('id') id: number, @User() user: UserEntity) {
-    return this.wishesService.copy(id, user);
+  copyById(@Param('id') id: number, @User() user: UserEntity) {
+    return this.wishesService.copyById(id, user);
   }
 
-  @Patch(':id') // not exist on frontend
+  @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  updateWish(
+  @UseInterceptors(
+    SensitiveOwnerDataInterceptor,
+    SensitiveOffersDataInterceptor
+  )
+  updateById(
     @Param('id') id: number,
     @Body() updateWishDto: UpdateWishDto,
     @User() user: UserEntity
   ) {
-    return this.wishesService.updateByOwner(id, updateWishDto, user);
+    return this.wishesService.updateById(id, updateWishDto, user);
   }
 
-  @Delete(':id') // not exist on frontend
+  @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  deleteWish(@Param('id') id: number, @User() user: UserEntity) {
-    return this.wishesService.removeByOwner(id, user.id);
+  @UseInterceptors(
+    SensitiveOwnerDataInterceptor,
+    SensitiveOffersDataInterceptor
+  )
+  removeById(@Param('id') id: number, @User() user: UserEntity) {
+    return this.wishesService.removeById(id, user.id);
   }
 }

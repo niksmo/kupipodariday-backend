@@ -9,5 +9,6 @@ import { WishlistsService } from './wishlists.service';
   imports: [TypeOrmModule.forFeature([Wishlist]), WishesModule],
   controllers: [WishlistsController],
   providers: [WishlistsService],
+  exports: [WishlistsService],
 })
 export class WishListsModule {}
