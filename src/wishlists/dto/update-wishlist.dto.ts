@@ -1,7 +1,8 @@
-import { ArrayNotEmpty, IsUrl, Length } from 'class-validator';
+import { ArrayNotEmpty, IsOptional, IsUrl, Length } from 'class-validator';
 import { specifyMessage } from 'utils';
 
-export class CreateWishlistDto {
+export class UpdateWishlistDto {
+  @IsOptional()
   @Length(
     1,
     250,
@@ -9,9 +10,11 @@ export class CreateWishlistDto {
   )
   name: string;
 
+  @IsOptional()
   @IsUrl(undefined, specifyMessage('Неверная ссылка на картинку'))
   image: string;
 
+  @IsOptional()
   @ArrayNotEmpty(specifyMessage('Список подарков не может быть пустым'))
   itemsId: number[];
 }
