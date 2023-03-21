@@ -14,8 +14,8 @@ import {
 import { User } from 'decorators';
 import { JwtAuthGuard } from 'guards';
 import {
-  ExcludeUserEmailInterceptor,
-  ExcludeUserPasswordInterceptor,
+  ExcludeEmailInterceptor,
+  ExcludePasswordInterceptor,
   SensitiveOwnerDataInterceptor,
 } from 'interceptors';
 import { isEmptyBody, specifyMessage } from 'utils';
@@ -40,7 +40,7 @@ export class UsersController {
   }
 
   @Get('me')
-  @UseInterceptors(ExcludeUserPasswordInterceptor)
+  @UseInterceptors(ExcludePasswordInterceptor)
   getUser(@User() user: UserEntity) {
     return this.usersService.findOne({ where: { id: user.id } });
   }
@@ -55,7 +55,7 @@ export class UsersController {
   }
 
   @Patch('me')
-  @UseInterceptors(ExcludeUserPasswordInterceptor)
+  @UseInterceptors(ExcludePasswordInterceptor)
   updateUser(@Body() updateUserDto: UpdateUserDto, @User() user: UserEntity) {
     if (isEmptyBody(updateUserDto)) {
       return user;
@@ -64,7 +64,7 @@ export class UsersController {
   }
 
   @Get(':username')
-  @UseInterceptors(ExcludeUserEmailInterceptor, ExcludeUserPasswordInterceptor)
+  @UseInterceptors(ExcludeEmailInterceptor, ExcludePasswordInterceptor)
   async findUserByName(@Param('username') username: string) {
     const user = await this.usersService.findOne({
       where: { username: username },

@@ -7,11 +7,11 @@ import {
 import { map } from 'rxjs';
 
 @Injectable()
-export class ExcludeUserPasswordInterceptor implements NestInterceptor {
+export class ExcludeEmailInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler) {
     return next.handle().pipe(
-      map<{ password?: string }, unknown>((data) => {
-        delete data.password;
+      map<{ email?: string }, unknown>((data) => {
+        delete data.email;
         return data;
       })
     );

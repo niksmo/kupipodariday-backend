@@ -1,6 +1,7 @@
 import {
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -72,5 +73,37 @@ export class OffersService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async findOne(...query: Parameters<typeof this.offersRepository.findOne>) {
+    const offer = await this.offersRepository.findOne(...query);
+
+    if (offer === null) {
+      throw new NotFoundException(specifyMessage('Оффер не найден'));
+    }
+
+    return offer;
+  }
+
+  async updateOne(...query: Parameters<typeof this.offersRepository.save>) {
+    return this.offersRepository.save(...query);
+  }
+
+  async removeOne(...query: Parameters<typeof this.offersRepository.remove>) {
+    return this.offersRepository.remove(...query);
+  }
+
+  async findAll() {
+    return this.offersRepository.find({
+      where: { hidden: false },
+      relations: { user: true, item: true },
+    });
+  }
+
+  async findOneById(offerId: Offer['id']) {
+    return this.findOne({
+      where: { id: offerId, hidden: false },
+      relations: { item: true, user: true },
+    });
   }
 }
