@@ -1,47 +1,55 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TAppConfig } from 'config/app-config';
-import { FindOneOptions, FindOptionsWhere, Like, Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './entities/user.entity';
 import { hashPassword } from './lib';
-import { specifyMessage } from 'utils';
+import { isEmptyBody, specifyMessage } from 'utils';
+import { WishesService } from 'wishes/wishes.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    private wishesService: WishesService,
     private configService: ConfigService<TAppConfig, true>
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User | null> {
+  async create(createUserDto: CreateUserDto) {
     await hashPassword(createUserDto, this.configService.get('hashRounds'));
     return await this.usersRepository.save(createUserDto);
   }
 
-  findOne(query: FindOneOptions<User>) {
-    return this.usersRepository.findOne(query);
+  async findOne(...query: Parameters<typeof this.usersRepository.findOne>) {
+    return this.usersRepository.findOne(...query);
   }
 
-  findMany(query: string) {
-    const normalizedQuery = query.toLowerCase();
-    return this.usersRepository.find({
-      where: [
-        { username: Like(`%${normalizedQuery}%`) },
-        { email: normalizedQuery },
-      ],
+  async findMany(...query: Parameters<typeof this.usersRepository.find>) {
+    return this.usersRepository.find(...query);
+  }
+
+  async updateOne(...query: Parameters<typeof this.usersRepository.save>) {
+    return this.usersRepository.save(...query);
+  }
+
+  async findViewerWishes(userId: User['id']) {
+    return this.wishesService.findMany({
+      where: { owner: { id: userId } },
+      relations: { owner: true, offers: true },
     });
   }
 
-  updateOne(query: FindOptionsWhere<User>, updateUserDto: UpdateUserDto) {
-    return this.usersRepository.update(query, updateUserDto);
-  }
+  async updateViewer(updateUserDto: UpdateUserDto, user: User) {
+    if (isEmptyBody(updateUserDto)) {
+      return user;
+    }
 
-  async updateByOwner(
-    updateUserDto: UpdateUserDto,
-    user: User
-  ): Promise<User | null> {
     if (updateUserDto.username && updateUserDto.username !== user.username) {
       const isExistUsername = await this.findOne({
         where: { username: updateUserDto.username },
@@ -67,7 +75,36 @@ export class UsersService {
     }
 
     await hashPassword(updateUserDto, this.configService.get('hashRounds'));
-    await this.updateOne({ id: user.id }, updateUserDto);
-    return this.findOne({ where: { id: user.id } });
+
+    const updatedUser = { ...user, ...updateUserDto };
+
+    return this.updateOne(updatedUser);
+  }
+
+  async findUsersByNameOrEmail(query: string) {
+    const normalizedQuery = query.toLowerCase();
+    return this.findMany({
+      where: [
+        { username: Like(`%${normalizedQuery}%`) },
+        { email: normalizedQuery },
+      ],
+    });
+  }
+
+  async findUserByName(username: User['username']) {
+    const user = await this.findOne({ where: { username } });
+
+    if (!user) {
+      throw new NotFoundException(
+        specifyMessage('Пользователь с таким именем не найден')
+      );
+    }
+    return user;
+  }
+
+  async findUserWishes(username: User['username']) {
+    return this.wishesService.findMany({
+      where: { owner: { username } },
+    });
   }
 }

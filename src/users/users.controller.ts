@@ -4,7 +4,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -16,10 +15,9 @@ import { JwtAuthGuard } from 'guards';
 import {
   ExcludeEmailInterceptor,
   ExcludePasswordInterceptor,
+  SensitiveOffersDataInterceptor,
   SensitiveOwnerDataInterceptor,
 } from 'interceptors';
-import { isEmptyBody, specifyMessage } from 'utils';
-import { WishesService } from 'wishes/wishes.service';
 import { FindUsersDto, UpdateUserDto } from './dto';
 import { User as UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
@@ -27,60 +25,43 @@ import { UsersService } from './users.service';
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly wishesService: WishesService
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post('find')
   @HttpCode(HttpStatus.OK)
-  async findUsersByNameOrEmail(@Body() findUsersDto: FindUsersDto) {
-    const { query } = findUsersDto;
-    return this.usersService.findMany(query);
+  findUsersByNameOrEmail(@Body() findUsersDto: FindUsersDto) {
+    return this.usersService.findUsersByNameOrEmail(findUsersDto.query);
   }
 
   @Get('me')
   @UseInterceptors(ExcludePasswordInterceptor)
-  getUser(@User() user: UserEntity) {
-    return this.usersService.findOne({ where: { id: user.id } });
+  findViewer(@User() user: UserEntity) {
+    return user;
   }
 
   @Get('me/wishes')
-  @UseInterceptors(SensitiveOwnerDataInterceptor)
-  getUserWishes(@User() user: UserEntity) {
-    return this.wishesService.findMany({
-      where: { owner: { id: user.id } },
-      relations: { owner: true, offers: true },
-    });
+  @UseInterceptors(
+    SensitiveOwnerDataInterceptor,
+    SensitiveOffersDataInterceptor
+  )
+  findViewerWishes(@User() user: UserEntity) {
+    return this.usersService.findViewerWishes(user.id);
   }
 
   @Patch('me')
   @UseInterceptors(ExcludePasswordInterceptor)
-  updateUser(@Body() updateUserDto: UpdateUserDto, @User() user: UserEntity) {
-    if (isEmptyBody(updateUserDto)) {
-      return user;
-    }
-    return this.usersService.updateByOwner(updateUserDto, user);
+  updateViewer(@Body() updateUserDto: UpdateUserDto, @User() user: UserEntity) {
+    return this.usersService.updateViewer(updateUserDto, user);
   }
 
   @Get(':username')
   @UseInterceptors(ExcludeEmailInterceptor, ExcludePasswordInterceptor)
-  async findUserByName(@Param('username') username: string) {
-    const user = await this.usersService.findOne({
-      where: { username: username },
-    });
-    if (!user) {
-      throw new NotFoundException(
-        specifyMessage('Пользователь с таким именем не найден')
-      );
-    }
-    return user;
+  findUserByName(@Param('username') username: string) {
+    return this.usersService.findUserByName(username);
   }
 
   @Get(':username/wishes')
   findUserWishes(@Param('username') username: string) {
-    return this.wishesService.findMany({
-      where: { owner: { username } },
-    });
+    return this.usersService.findUserWishes(username);
   }
 }
